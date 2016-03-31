@@ -1,0 +1,42 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: Christopher
+ * Date: 3/22/2016
+ * Time: 4:13 PM
+ */
+
+namespace ControlPanelBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+/**
+ * Motivo Movimeinto Inventario
+ *
+ * @ORM\Entity(repositoryClass="ControlPanelBundle\Repository\MotivoMovimientoInventario")
+ */
+class MotivoMovimientoInventario
+{
+    /**
+     * @var int
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     */
+    private $id;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="nombre", type="string", length=64)
+     */
+    private $nombre;
+
+    /**
+     * @var int
+     * 
+     * @ORM\Column(name="tipo", type="integer", length=1)
+     */
+    private $tipo;
+    
+}
