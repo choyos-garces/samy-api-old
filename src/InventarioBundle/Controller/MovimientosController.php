@@ -81,31 +81,35 @@ class MovimientosController extends BaseController
         $movimiento->setBodega($bodega);
         $movimiento->setMotivoMovimiento($motivoMovimiento);
 
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($movimiento);
-        $em->flush();
+        //$em = $this->getDoctrine()->getManager();
+        //$em->persist($movimiento);
+        //$em->flush();
 
+        $tmp = [];
         foreach ($payload->movimientosMateriales as $movimientoMaterial)
         {
-            $material = $this->getDoctrine()->getRepository("AdministracionBundle:Material")->findOneBy(array("id" => $movimientoMaterial->material->id));
+            $inventario = $this->getDoctrine()
+                ->getRepository("InventarioBundle:InventarioMaterial")
+                ->findOneBy(array(
+                    "material" => $movimientoMaterial->material->id,
+                    "bodega" => $payload->bodega->id
+                ));
 
-            $mm = new MovimientoMaterial();
-            $mm->setTipoMovimiento($payload->tipoMovimiento);
-            $mm->setCantidad($movimientoMaterial->cantidad);
-            $mm->setMaterial($material);
-            $mm->setMovimientoInventario($movimiento);
-            $movimiento->addMovimientosMateriale($mm);
+            //if($payload->tipoMovimiento == 1 && $inventario == null)
+            echo gettype($inventario);
+            $tmp[] = $inventario;
         }
-        $em->persist($movimiento);
-        $em->flush();
+        //$em->persist($movimiento);
+        //$em->flush();
 
 
         $movimeintoURL = $this->generateUrl(
             "inventario_movimiento_ver",
-            ["id" => $movimiento->getId()]
+            ["id" => 1]
         );
 
-        $response = $this->apiResponse($movimiento, 201);
+        //$response = $this->apiResponse($movimiento, 201);
+        $response = $this->apiResponse($tmp);
         $response->headers->set("Location", $movimeintoURL);
 
         return $response;

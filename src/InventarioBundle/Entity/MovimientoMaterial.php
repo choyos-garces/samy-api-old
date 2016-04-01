@@ -41,6 +41,11 @@ class MovimientoMaterial
     private $material;
 
     /**
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Bodega")
+     */
+    private $bodega;
+    
+    /**
      * @ORM\ManyToOne(targetEntity="InventarioBundle\Entity\MovimientoInventario", inversedBy="movimientosMateriales", cascade={"persist"})
      */
     private $movimientoInventario;
@@ -149,5 +154,29 @@ class MovimientoMaterial
     public function getMaterial()
     {
         return $this->material;
+    }
+
+    /**
+     * Set bodega
+     *
+     * @param \AdministracionBundle\Entity\Bodega $bodega
+     *
+     * @return MovimientoMaterial
+     */
+    public function setBodega(\AdministracionBundle\Entity\Bodega $bodega = null)
+    {
+        $this->bodega = $bodega;
+
+        return $this;
+    }
+
+    /**
+     * Get bodega
+     *
+     * @return \AdministracionBundle\Entity\Bodega
+     */
+    public function getBodega()
+    {
+        return $this->bodega;
     }
 }

@@ -59,4 +59,110 @@ class InventarioMaterial
     public function preUpdate() {
         $this->fecha = new \DateTime();
     }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set cantidad
+     *
+     * @param string $cantidad
+     *
+     * @return InventarioMaterial
+     */
+    public function setCantidad($cantidad)
+    {
+        $this->cantidad = $cantidad;
+
+        return $this;
+    }
+
+    /**
+     * Get cantidad
+     *
+     * @return string
+     */
+    public function getCantidad()
+    {
+        return $this->cantidad;
+    }
+
+    /**
+     * Set fecha
+     *
+     * @param \DateTime $fecha
+     *
+     * @return InventarioMaterial
+     */
+    public function setFecha($fecha)
+    {
+        $this->fecha = $fecha;
+
+        return $this;
+    }
+
+    /**
+     * Get fecha
+     *
+     * @return \DateTime
+     */
+    public function getFecha()
+    {
+        return $this->fecha;
+    }
+
+    /**
+     * Set material
+     *
+     * @param \AdministracionBundle\Entity\Material $material
+     *
+     * @return InventarioMaterial
+     */
+    public function setMaterial(\AdministracionBundle\Entity\Material $material = null)
+    {
+        $this->material = $material;
+
+        return $this;
+    }
+
+    /**
+     * Get material
+     *
+     * @return \AdministracionBundle\Entity\Material
+     */
+    public function getMaterial()
+    {
+        return $this->material;
+    }
+
+    /**
+     * Set bodega
+     *
+     * @param \AdministracionBundle\Entity\Bodega $bodega
+     *
+     * @return InventarioMaterial
+     */
+    public function setBodega(\AdministracionBundle\Entity\Bodega $bodega = null)
+    {
+        $this->bodega = $bodega;
+
+        return $this;
+    }
+
+    /**
+     * Get bodega
+     *
+     * @return \AdministracionBundle\Entity\Bodega
+     */
+    public function getBodega()
+    {
+        return $this->bodega;
+    }
 }

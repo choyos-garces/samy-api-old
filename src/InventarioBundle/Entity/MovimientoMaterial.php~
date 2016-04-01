@@ -41,6 +41,11 @@ class MovimientoMaterial
     private $material;
 
     /**
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Bodega")
+     */
+    private $bodega;
+    
+    /**
      * @ORM\ManyToOne(targetEntity="InventarioBundle\Entity\MovimientoInventario", inversedBy="movimientosMateriales", cascade={"persist"})
      */
     private $movimientoInventario;

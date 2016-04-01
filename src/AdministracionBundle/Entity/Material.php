@@ -149,6 +149,7 @@ class Material
      */
     public function prePersist() {
         $this->fecha = new \DateTime();
+        $this->cantidad = 0;
     }
 
     /**

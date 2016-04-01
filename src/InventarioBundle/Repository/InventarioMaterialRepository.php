@@ -11,4 +11,7 @@ use Doctrine\ORM\EntityRepository;
  */
 class InventarioMaterialRepository extends EntityRepository
 {
+    public function getInventario() {
+        
+    }
 }
