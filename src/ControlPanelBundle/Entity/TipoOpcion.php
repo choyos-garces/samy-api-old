@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Table(name="tipo_opcion")
  * @ORM\Entity(repositoryClass="ControlPanelBundle\Repository\TipoOpcionRepository")
  */
-class TipoOpcion
+class TipoOpcion implements \JsonSerializable
 {
     /**
      * @var int
@@ -72,4 +72,15 @@ class TipoOpcion
     {
         return $this->nombre;
     }
+
+    function jsonSerialize()
+    {
+        return [
+            "id" => $this->id,
+            "nombre" =>  $this->nombre,
+            "grupo" => $this->grupo
+        ];
+    }
+
+
 }

@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="InventarioBundle\Repository\MovimientoMaterialRepository")
  * @ORM\HasLifecycleCallbacks
  */
-class MovimientoMaterial
+class MovimientoMaterial implements \JsonSerializable
 {
     /**
      * @var int
@@ -239,5 +239,16 @@ class MovimientoMaterial
 
         $this->getMaterial()->setCantidad($nuevoInventario);
     }
+
+    function jsonSerialize()
+    {
+        return [
+            "id" => $this->id,
+            "cantidadPrevia" => $this->cantidadPrevia,
+            "cantidad" => $this->cantidad,
+            "tipoMovimiento" => $this->tipoMovimiento,
+        ];
+    }
+
 
 }

@@ -10,4 +10,24 @@ namespace AdministracionBundle\Repository;
  */
 class MaterialRepository extends \Doctrine\ORM\EntityRepository
 {
+    public function findAllA() {
+        $materiales = $this->createQueryBuilder('m')
+            ->select(['m.id', 'IDENTITY(m.tipoMaterial) as tipoMaterial', 'm.codigo', 'm.nombre', 'm.cantidad', 'm.fecha'])
+            ->getQuery()
+            ->getArrayResult();
+
+        foreach($materiales as &$material) {
+            $tipoMaterial = $this->getEntityManager()->createQueryBuilder()
+                ->select('t')
+                ->from('ControlPanelBundle:TipoOpcion', 't')
+                ->where('t.id = :id')
+                ->setParameter('id', $material["tipoMaterial"])
+                ->getQuery()
+                ->getOneOrNullResult();
+
+            $material["tipoMaterial"] = $tipoMaterial;
+        }
+
+        return $materiales;
+    }
 }

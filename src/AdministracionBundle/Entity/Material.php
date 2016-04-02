@@ -4,7 +4,6 @@ namespace AdministracionBundle\Entity;
 
 use ControlPanelBundle\Entity\TipoOpcion;
 use Doctrine\ORM\Mapping as ORM;
-use InventarioBundle\Entity\InventarioMaterial;
 
 /**
  * Material
@@ -13,7 +12,7 @@ use InventarioBundle\Entity\InventarioMaterial;
  * @ORM\Entity(repositoryClass="AdministracionBundle\Repository\MaterialRepository")
  * @ORM\HasLifecycleCallbacks
  */
-class Material
+class Material implements \JsonSerializable
 {
     /**
      * @var int
@@ -49,12 +48,6 @@ class Material
      * @ORM\Column(type="decimal", precision=9, scale=2, options={"default"=0})
      */
     private $cantidad;
-
-    /**
-     * @var InventarioMaterial
-     * @ORM\OneToMany(targetEntity="InventarioBundle\Entity\InventarioMaterial", mappedBy="material")
-     */
-    private $inventario;
 
     /**
      * @var \DateTime
@@ -145,14 +138,6 @@ class Material
     }
 
     /**
-     * @ORM\PrePersist
-     */
-    public function prePersist() {
-        $this->fecha = new \DateTime();
-        $this->cantidad = 0;
-    }
-
-    /**
      * Set fecha
      *
      * @param \DateTime $fecha
@@ -199,45 +184,26 @@ class Material
     {
         return $this->cantidad;
     }
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->inventario = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
     /**
-     * Add inventario
-     *
-     * @param \InventarioBundle\Entity\InventarioMaterial $inventario
-     *
-     * @return Material
+     * @ORM\PrePersist
      */
-    public function addInventario(\InventarioBundle\Entity\InventarioMaterial $inventario)
-    {
-        $this->inventario[] = $inventario;
-
-        return $this;
+    public function prePersist() {
+        $this->fecha = new \DateTime();
+        $this->cantidad = 0;
     }
 
-    /**
-     * Remove inventario
-     *
-     * @param \InventarioBundle\Entity\InventarioMaterial $inventario
-     */
-    public function removeInventario(\InventarioBundle\Entity\InventarioMaterial $inventario)
+    function jsonSerialize()
     {
-        $this->inventario->removeElement($inventario);
+        return [
+            "id" => $this->id,
+            "tipoMaterial" => $this->getTipoMaterial(),
+            "codigo" => $this->codigo,
+            "nombre" => $this->nombre,
+            "cantidad" => $this->cantidad,
+            "fecha" => $this->fecha
+        ];
     }
 
-    /**
-     * Get inventario
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getInventario()
-    {
-        return $this->inventario;
-    }
+
 }

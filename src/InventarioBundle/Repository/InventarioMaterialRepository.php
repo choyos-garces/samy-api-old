@@ -28,17 +28,12 @@ class InventarioMaterialRepository extends EntityRepository
             ->getOneOrNullResult();
     }
 
+
     public function lazyLoadAll() {
-        $query =  $this->getEntityManager()->createQuery('
-            SELECT
-            i.id AS id, i.fecha AS fecha, m.id AS materialId, m.nombre AS material, b.id AS bodegaId, b.nombre as bodega, i.cantidad AS inventario, m.cantidad AS total
-            
-            FROM InventarioBundle:InventarioMaterial i
-            
-            JOIN AdministracionBundle:Material m WITH i.material = m.id
-            JOIN AdministracionBundle:Bodega b WITH i.bodega = b.id
-        ');
-        
-        return $query->getResult();
+        return $this->createQueryBuilder('i')
+            ->select(array("i.bodega as bodega", "i.material as material", "i.cantidad"))
+            ->join('i.bodega', 'b')
+            ->join('i.material', 'm')
+            ->getQuery()->getResult();
     }
 }

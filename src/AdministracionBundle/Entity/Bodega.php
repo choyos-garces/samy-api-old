@@ -10,7 +10,7 @@ use InventarioBundle\Entity\InventarioMaterial;
  * @ORM\Entity(repositoryClass="AdministracionBundle\Repository\BodegaRepository")
  * @ORM\HasLifecycleCallbacks
  */
-class Bodega
+class Bodega implements \JsonSerializable
 {
     /**
      * @var int
@@ -32,12 +32,6 @@ class Bodega
      * @ORM\Column(type="string", length=64)
      */
     private $nombre;
-
-    /**
-     * @var InventarioMaterial
-     * @ORM\OneToMany(targetEntity="InventarioBundle\Entity\InventarioMaterial", mappedBy="bodega")
-     */
-    private $inventario;
     
     /**
      * @var \DateTime
@@ -174,4 +168,16 @@ class Bodega
     {
         return $this->inventario;
     }
+
+    function jsonSerialize()
+    {
+        return [
+            "id" => $this->id,
+            "codigo" => $this->codigo,
+            "nombre" => $this->nombre,
+            "fecha" => $this->fecha
+        ];
+    }
+
+
 }

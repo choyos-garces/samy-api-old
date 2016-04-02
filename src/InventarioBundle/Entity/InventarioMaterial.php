@@ -31,13 +31,13 @@ class InventarioMaterial
 
     /**
      * @var Material $material Material/Bodega
-     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Material", inversedBy="inventario")
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Material")
      */
     private $material;
 
     /**
      * @var Bodega $bodega
-     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Bodega", inversedBy="inventario")
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Bodega")
      */
     private $bodega;
 
@@ -172,4 +172,5 @@ class InventarioMaterial
     {
         return $this->bodega;
     }
+
 }

@@ -8,6 +8,8 @@
 
 namespace SamyBundle\Controller;
 
+define('JSON_SIMPLE', 0);
+define('JSON_JMS', 1);
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\FormInterface;
@@ -16,9 +18,10 @@ use Symfony\Component\HttpFoundation\Response;
 
 class BaseController extends Controller
 {
-    protected function apiResponse($data, $statuscode = 200)
+    
+    protected function apiResponse($data, $statuscode = 200, $serializer = JSON_JMS)
     {
-        $json = $this->serializer($data);
+        $json = $this->serializer($data, $serializer);
 
         $response = new Response($json, $statuscode, [
            "Content-Type" => "application/json"
@@ -27,8 +30,9 @@ class BaseController extends Controller
         return $response;
     }
 
-    protected function serializer($data)
+    protected function serializer($data, $type)
     {
+        if($type == JSON_SIMPLE) return json_encode($data);
         return $this->get("jms_serializer")->serialize($data, 'json');
     }
 

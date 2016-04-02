@@ -33,7 +33,7 @@ class MovimientosController extends BaseController
     public function indexAction() {
         $movimientos = $this->getDoctrine()
             ->getRepository("InventarioBundle:MovimientoInventario")
-            ->findAll();
+            ->findBy([], ["fecha" => "DESC"]);
 
         $response = $this->apiResponse(["movimientos" => $movimientos]);
         
