@@ -57,6 +57,13 @@ class ExistenteController extends BaseController
             ->getRepository('AdministracionBundle:Bodega')
             ->findOneBy(["id" => $bodegaId]);
 
+        $inventario = $this->getDoctrine()
+            ->getRepository('InventarioBundle:InventarioMaterial')
+            ->findOneBy([
+                "material" => $material,
+                "bodega" => $bodega
+            ]);
+
         $movimientos = $this->getDoctrine()
             ->getRepository('InventarioBundle:MovimientoMaterial')
             ->findBy(
@@ -65,9 +72,8 @@ class ExistenteController extends BaseController
             );
 
         $data = [
-            "movimientosMateriales" => $movimientos,
-            "material" => $material,
-            "bodega" => $bodega
+            "inventario" => $inventario,
+            "movimientos" => $movimientos
         ];
         return $this->apiResponse($data, 200, JSON_SIMPLE);
     }

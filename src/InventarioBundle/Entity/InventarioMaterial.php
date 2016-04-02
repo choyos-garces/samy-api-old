@@ -19,7 +19,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="InventarioBundle\Repository\InventarioMaterialRepository")
  * @ORM\HasLifecycleCallbacks
  */
-class InventarioMaterial
+class InventarioMaterial implements \JsonSerializable
 {
     /**
      * @var integer $id Index
@@ -171,6 +171,17 @@ class InventarioMaterial
     public function getBodega()
     {
         return $this->bodega;
+    }
+
+    function jsonSerialize()
+    {
+        return [
+            "id" => $this->id,
+            "cantidad" => $this->cantidad,
+            "material" => $this->getMaterial(),
+            "bodega" => $this->getBodega(),
+            "fecha" => $this->fecha->format(\DateTime::ISO8601)
+        ];
     }
 
 }

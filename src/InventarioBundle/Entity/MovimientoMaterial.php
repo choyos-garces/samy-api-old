@@ -247,6 +247,7 @@ class MovimientoMaterial implements \JsonSerializable
             "cantidadPrevia" => $this->cantidadPrevia,
             "cantidad" => $this->cantidad,
             "tipoMovimiento" => $this->tipoMovimiento,
+            "fecha"=> $this->fecha->format(\DateTime::ISO8601)
         ];
     }
 
