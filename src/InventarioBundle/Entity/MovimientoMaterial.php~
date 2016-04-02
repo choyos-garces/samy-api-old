@@ -29,6 +29,13 @@ class MovimientoMaterial
     private $cantidad;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $cantidadPrevia;
+    
+    /**
      * @var int
      *
      * @ORM\Column(name="tipoMovimiento", type="integer")
@@ -154,5 +161,29 @@ class MovimientoMaterial
     public function getMaterial()
     {
         return $this->material;
+    }
+
+    /**
+     * Set bodega
+     *
+     * @param \AdministracionBundle\Entity\Bodega $bodega
+     *
+     * @return MovimientoMaterial
+     */
+    public function setBodega(\AdministracionBundle\Entity\Bodega $bodega = null)
+    {
+        $this->bodega = $bodega;
+
+        return $this;
+    }
+
+    /**
+     * Get bodega
+     *
+     * @return \AdministracionBundle\Entity\Bodega
+     */
+    public function getBodega()
+    {
+        return $this->bodega;
     }
 }

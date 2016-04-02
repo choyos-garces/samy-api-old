@@ -2,6 +2,8 @@
 
 namespace InventarioBundle\Entity;
 
+use AdministracionBundle\Entity\Bodega;
+use AdministracionBundle\Entity\Material;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -9,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="movimiento_material")
  * @ORM\Entity(repositoryClass="InventarioBundle\Repository\MovimientoMaterialRepository")
+ * @ORM\HasLifecycleCallbacks
  */
 class MovimientoMaterial
 {
@@ -29,6 +32,13 @@ class MovimientoMaterial
     private $cantidad;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(type="decimal", precision=10, scale=2)
+     */
+    private $cantidadPrevia;
+    
+    /**
      * @var int
      *
      * @ORM\Column(name="tipoMovimiento", type="integer")
@@ -36,11 +46,15 @@ class MovimientoMaterial
     private $tipoMovimiento;
 
     /**
+     * @var Material $material
+     *
      * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Material")
      */
     private $material;
 
     /**
+     * @var Bodega $bodega
+     *
      * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Bodega")
      */
     private $bodega;
@@ -49,6 +63,13 @@ class MovimientoMaterial
      * @ORM\ManyToOne(targetEntity="InventarioBundle\Entity\MovimientoInventario", inversedBy="movimientosMateriales", cascade={"persist"})
      */
     private $movimientoInventario;
+
+    /**
+     * @var \DateTime
+     * @ORM\Column(type="datetime")
+     *
+     */
+    private $fecha;
 
     /**
      * Get id
@@ -179,4 +200,44 @@ class MovimientoMaterial
     {
         return $this->bodega;
     }
+
+    /**
+     * Set cantidadPrevia
+     *
+     * @param string $cantidadPrevia
+     *
+     * @return MovimientoMaterial
+     */
+    public function setCantidadPrevia($cantidadPrevia)
+    {
+        $this->cantidadPrevia = $cantidadPrevia;
+
+        return $this;
+    }
+
+    /**
+     * Get cantidadPrevia
+     *
+     * @return string
+     */
+    public function getCantidadPrevia()
+    {
+        return $this->cantidadPrevia;
+    }
+
+    /**
+     * @ORM\PrePersist()
+     */
+    public function prePersist() {
+        $this->fecha = new \DateTime();
+
+        $viejoInventario = floatval($this->getMaterial()->getCantidad());
+        $cantida = floatval($this->cantidad);
+
+        // 0 es Egreso; 1 es Ingreso
+        $nuevoInventario = ($this->tipoMovimiento == 0 ) ? $viejoInventario - $cantida : $viejoInventario + $cantida;
+
+        $this->getMaterial()->setCantidad($nuevoInventario);
+    }
+
 }

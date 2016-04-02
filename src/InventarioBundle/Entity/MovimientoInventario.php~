@@ -4,6 +4,7 @@ namespace InventarioBundle\Entity;
 
 use AdministracionBundle\Entity\Bodega;
 use ControlPanelBundle\Entity\MotivoMovimientoInventario;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -184,7 +185,7 @@ class MovimientoInventario
      *
      * @return MovimientoInventario
      */
-    public function addMovimientosMateriale(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
+    public function addMovimientoMaterial(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
     {
         $this->movimientosMateriales[] = $movimientosMateriale;
 
@@ -196,11 +197,18 @@ class MovimientoInventario
      *
      * @param \InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale
      */
-    public function removeMovimientosMateriale(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
+    public function removeMovimientoMaterial(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
     {
         $this->movimientosMateriales->removeElement($movimientosMateriale);
     }
 
+    /**
+     * @param $movimientosMateriales
+     */
+    public function setMovimientosMateriales($movimientosMateriales) {
+        $this->movimientosMateriales = $movimientosMateriales;    
+    }
+    
     /**
      * Get movimientosMateriales
      *

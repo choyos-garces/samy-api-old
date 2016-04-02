@@ -8,10 +8,10 @@
 
 namespace InventarioBundle\Controller;
 
+use InventarioBundle\Entity\InventarioMaterial;
 use InventarioBundle\Entity\MovimientoInventario;
 
 use InventarioBundle\Entity\MovimientoMaterial;
-use InventarioBundle\Form\MovimientoInventarioType;
 use SamyBundle\Controller\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -69,48 +69,122 @@ class MovimientosController extends BaseController
     public function ingresarAction(Request $request) {
         $payload = json_decode($request->getContent());
 
-        
-        
-        
-        
-        $bodega = $this->getDoctrine()->getRepository("AdministracionBundle:Bodega")->findOneBy(array("id" => $payload->bodega->id));
-        $motivoMovimiento = $this->getDoctrine()->getRepository("ControlPanelBundle:MotivoMovimientoInventario")->findOneBy(array("id" => $payload->motivoMovimiento->id));
-        
-        $movimiento = new MovimientoInventario();
-        $movimiento->setTipoMovimiento($payload->tipoMovimiento);
-        $movimiento->setBodega($bodega);
-        $movimiento->setMotivoMovimiento($motivoMovimiento);
+        /** @var MovimientoMaterial[] $movimeintosMateriales */
+        $movimeintosMateriales = [];
 
-        //$em = $this->getDoctrine()->getManager();
-        //$em->persist($movimiento);
-        //$em->flush();
+        /** @var InventarioMaterial $inventarios */
+        $inventarios = [];
+        $errors = [];
 
-        $tmp = [];
+        $bodega = $this->getDoctrine()
+            ->getRepository("AdministracionBundle:Bodega")
+            ->findOneBy(array("id" => $payload->bodega->id));
+
+        // Primero revisa el Request por el movimiento de material
+        // Si no hay movimientos de materiales deberia retornar un error de inmediato
         foreach ($payload->movimientosMateriales as $movimientoMaterial)
         {
-            $inventario = $this->getDoctrine()
-                ->getRepository("InventarioBundle:InventarioMaterial")
-                ->findOneBy(array(
-                    "material" => $movimientoMaterial->material->id,
-                    "bodega" => $payload->bodega->id
-                ));
+            $error = false;
+            $material = $this->getDoctrine()
+                ->getRepository("AdministracionBundle:Material")
+                ->findOneBy(array("id" => $movimientoMaterial->material->id));
 
-            //if($payload->tipoMovimiento == 1 && $inventario == null)
-            echo gettype($inventario);
-            $tmp[] = $inventario;
+            if($material && $bodega) {
+
+                $inventario = $this->getDoctrine()
+                    ->getRepository("InventarioBundle:InventarioMaterial")
+                    ->findOneBy(array(
+                        "material" => $material,
+                        "bodega" => $bodega
+                    ));
+
+                if($inventario) {
+                    $inventarioExistente  = floatval($inventario->getCantidad());
+                    // 0 es Egreso; 1 es Ingreso
+                    if($payload->tipoMovimiento == 0 && $inventarioExistente < $movimientoMaterial->cantidad ) $error = "No hay suficiente material {$material->getId()}:{$material->getNombre()}";
+                    else if($payload->tipoMovimiento == 0 && $inventarioExistente >= $movimientoMaterial->cantidad ) {
+                        $nuevoInventario = $inventarioExistente - $movimientoMaterial->cantidad;
+                        $inventario->setCantidad($nuevoInventario);
+                    }
+                    if($payload->tipoMovimiento == 1 ) {
+                        $nuevoInventario = $inventarioExistente + $movimientoMaterial->cantidad;
+                        $inventario->setCantidad($nuevoInventario);
+                    }
+                }
+                else
+                {
+                    $inventarioExistente = 0;
+                    if($payload->tipoMovimiento == 0) $error = "No existe Inventario para este material {$material->getId()}:{$material->getNombre()}";
+                    if($payload->tipoMovimiento == 1 ) {
+                        $inventario = new InventarioMaterial();
+                        $inventario->setCantidad($movimientoMaterial->cantidad);
+                        $inventario->setMaterial($material);
+                        $inventario->setBodega($bodega);
+                    }
+                }
+            }
+            else
+            {
+                $error ="Material {$material->getId()}:{$material->getNombre()} o bodega {$bodega->getId()}:{$bodega->getNombre()} no existen";
+            }
+
+            // Si no hubo errores:
+            // - Genrar un movimiento de material
+            // - Preparar el nuevo inventario de material para persistir
+            if($error == false) {
+                $log = new MovimientoMaterial();
+                $log->setTipoMovimiento($payload->tipoMovimiento);
+                $log->setBodega($bodega);
+                $log->setMaterial($material);
+                $log->setCantidadPrevia($inventarioExistente);
+                $log->setCantidad($movimientoMaterial->cantidad);
+
+                $movimeintosMateriales[] = $log;
+                $inventarios[] = $inventario;
+            }
+            else
+                $errors[] = $error;
         }
-        //$em->persist($movimiento);
-        //$em->flush();
 
+        if(count($errors) == 0 ) {
+            $motivoMovimiento = $this->getDoctrine()
+                ->getRepository("ControlPanelBundle:MotivoMovimientoInventario")
+                ->findOneBy(array("id" => $payload->motivoMovimiento->id));
 
-        $movimeintoURL = $this->generateUrl(
-            "inventario_movimiento_ver",
-            ["id" => 1]
-        );
+            $movimiento = new MovimientoInventario();
+            $movimiento->setTipoMovimiento($payload->tipoMovimiento);
+            $movimiento->setBodega($bodega);
+            $movimiento->setMotivoMovimiento($motivoMovimiento);
 
-        //$response = $this->apiResponse($movimiento, 201);
-        $response = $this->apiResponse($tmp);
-        $response->headers->set("Location", $movimeintoURL);
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($movimiento);
+
+            // Persiste los nuevos valores para el invetario y asigna el nuevo movimiento inventario
+            // a los movimeintos de materiales para el registro
+            for($i = 0; $i < count($inventarios); $i++) {
+                $movimeintosMateriales[$i]->setMovimientoInventario($movimiento);
+                $em->persist($inventarios[$i]);
+                $em->persist($movimeintosMateriales[$i]);
+            }
+
+            $em->flush();
+            $em->clear();
+
+            $movimiento = $this->getDoctrine()
+                ->getRepository("InventarioBundle:MovimientoInventario")
+                ->findOneBy(array("id" => $movimiento->getId()));
+
+            $movimeintoURL = $this->generateUrl(
+                "inventario_movimiento_ver",
+                ["id" => $movimiento->getId()]
+            );
+
+            $response = $this->apiResponse($movimiento, 201);
+            $response->headers->set("Location", $movimeintoURL);
+        }
+        else {
+           $response = $this->apiResponse($errors, 400);
+        }
 
         return $response;
     }

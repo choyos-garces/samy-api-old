@@ -11,6 +11,7 @@ namespace AdministracionBundle\Controller;
 
 use AdministracionBundle\Entity\Material;
 use ControlPanelBundle\Entity\TipoOpcion;
+use InventarioBundle\Entity\InventarioMaterial;
 use SamyBundle\Controller\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -55,12 +56,29 @@ class MaterialesController extends BaseController
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($material);
+
+        $bodegas = $this->getDoctrine()
+            ->getRepository("AdministracionBundle:Bodega")
+            ->findAll();
+
+
+        foreach ($bodegas as $bodega) {
+            $inventario = new InventarioMaterial();
+            $inventario->setBodega($bodega);
+            $inventario->setMaterial($material);
+            $inventario->setCantidad(0);
+
+            $em->persist($inventario);
+        }
+
         $em->flush();
+        $em->clear();
 
         $materialUrl = $this->generateUrl(
             "materiales_ver",
             ["id" => $material->getId()]
         );
+
         $response = $this->apiResponse($material, 201);
         $response->headers->set('Location', $materialUrl);
 

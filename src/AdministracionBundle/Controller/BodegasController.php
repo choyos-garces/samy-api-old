@@ -10,6 +10,7 @@ namespace AdministracionBundle\Controller;
 
 
 use AdministracionBundle\Entity\Bodega;
+use InventarioBundle\Entity\InventarioMaterial;
 use SamyBundle\Controller\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -64,8 +65,23 @@ class BodegasController extends BaseController
 
         $em = $this->getDoctrine()->getManager();
         $em->persist($bodega);
+        
+        $materiales = $this->getDoctrine()
+            ->getRepository("AdministracionBundle:Material")
+            ->findAll();
+        
+        foreach ($materiales as $material) {
+            $inventario = new InventarioMaterial();
+            $inventario->setBodega($bodega);
+            $inventario->setMaterial($material);
+            $inventario->setCantidad(0);
+            
+            $em->persist($inventario);
+        }
+        
         $em->flush();
-
+        $em->clear();
+        
         $bodegaURL = $this->generateUrl("bodega_ver", ["id" => $bodega->getId()]);
         $response = $this->apiResponse($bodega, 201);
         $response->headers->set("Location", $bodegaURL);

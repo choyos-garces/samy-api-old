@@ -184,6 +184,47 @@ class MovimientoInventario
      *
      * @return MovimientoInventario
      */
+    public function addMovimientoMaterial(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
+    {
+        $this->movimientosMateriales[] = $movimientosMateriale;
+
+        return $this;
+    }
+
+    /**
+     * Remove movimientosMateriale
+     *
+     * @param \InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale
+     */
+    public function removeMovimientoMaterial(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
+    {
+        $this->movimientosMateriales->removeElement($movimientosMateriale);
+    }
+
+    /**
+     * @param $movimientosMateriales
+     */
+    public function setMovimientosMateriales($movimientosMateriales) {
+        $this->movimientosMateriales = $movimientosMateriales;    
+    }
+    
+    /**
+     * Get movimientosMateriales
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getMovimientosMateriales()
+    {
+        return $this->movimientosMateriales;
+    }
+
+    /**
+     * Add movimientosMateriale
+     *
+     * @param \InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale
+     *
+     * @return MovimientoInventario
+     */
     public function addMovimientosMateriale(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
     {
         $this->movimientosMateriales[] = $movimientosMateriale;
@@ -199,15 +240,5 @@ class MovimientoInventario
     public function removeMovimientosMateriale(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
     {
         $this->movimientosMateriales->removeElement($movimientosMateriale);
-    }
-
-    /**
-     * Get movimientosMateriales
-     *
-     * @return \Doctrine\Common\Collections\Collection
-     */
-    public function getMovimientosMateriales()
-    {
-        return $this->movimientosMateriales;
     }
 }

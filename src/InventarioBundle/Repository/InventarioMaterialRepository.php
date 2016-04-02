@@ -2,6 +2,7 @@
 
 namespace InventarioBundle\Repository;
 use Doctrine\ORM\EntityRepository;
+use InventarioBundle\Entity\InventarioMaterial;
 
 /**
  * Inventario Material
@@ -11,7 +12,33 @@ use Doctrine\ORM\EntityRepository;
  */
 class InventarioMaterialRepository extends EntityRepository
 {
-    public function getInventario() {
+    /**
+     * @param $material
+     * @param $bodega
+     * @return InventarioMaterial
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function findByInventario($material, $bodega) {
+        return $this->createQueryBuilder('p')
+            ->where('p.material = :material')
+            ->andWhere('p.bodega = :bodega')
+            ->setParameter('material', $material)
+            ->setParameter('bodega', $bodega)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function lazyLoadAll() {
+        $query =  $this->getEntityManager()->createQuery('
+            SELECT
+            i.id AS id, i.fecha AS fecha, m.id AS materialId, m.nombre AS material, b.id AS bodegaId, b.nombre as bodega, i.cantidad AS inventario, m.cantidad AS total
+            
+            FROM InventarioBundle:InventarioMaterial i
+            
+            JOIN AdministracionBundle:Material m WITH i.material = m.id
+            JOIN AdministracionBundle:Bodega b WITH i.bodega = b.id
+        ');
         
+        return $query->getResult();
     }
 }

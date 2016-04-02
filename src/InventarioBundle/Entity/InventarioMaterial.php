@@ -54,6 +54,13 @@ class InventarioMaterial
     private $fecha;
 
     /**
+     * @ORM\PrePersist()
+     */
+    public function prePersist() {
+        $this->fecha = new \DateTime();
+    }
+    
+    /**
      * @ORM\PreUpdate
      */
     public function preUpdate() {
