@@ -50,12 +50,12 @@ class MovimientosController extends BaseController
     public function verAction($id) {
         $movimiento = $this->getDoctrine()
             ->getRepository("InventarioBundle:MovimientoInventario")
-            ->findBy(array("id" => $id));
+            ->findOneBy(array("id" => $id));
 
         if(!$movimiento)
-            throw $this->createNotFoundException("Movimiento de Inventario (id:{$id}) no encontrado");
-
-        $response = $this->apiResponse($movimiento);
+            $response = $this->apiResponse("Movimiento de Inventario (id:{$id}) no encontrado", 404);
+        else
+            $response = $this->apiResponse($movimiento);
         
         return $response;
     }

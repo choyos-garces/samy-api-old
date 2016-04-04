@@ -49,13 +49,21 @@ class ExistenteController extends BaseController
      */
     public function verAction($materialId, $bodegaId) {
 
+        $error = [];
+
         $material = $this->getDoctrine()
             ->getRepository('AdministracionBundle:Material')
             ->findOneBy(["id" => $materialId]);
 
+        if(!$material)
+            $error[] = "Inventario para Material (id:{$materialId}) no encontrado";
+
         $bodega = $this->getDoctrine()
             ->getRepository('AdministracionBundle:Bodega')
             ->findOneBy(["id" => $bodegaId]);
+
+        if(!$bodega)
+            $error[] = "Inventario para Bodega (id:{$materialId}) no encontrado";
 
         $inventario = $this->getDoctrine()
             ->getRepository('InventarioBundle:InventarioMaterial')
@@ -64,6 +72,7 @@ class ExistenteController extends BaseController
                 "bodega" => $bodega
             ]);
 
+
         $movimientos = $this->getDoctrine()
             ->getRepository('InventarioBundle:MovimientoMaterial')
             ->findBy(
@@ -71,10 +80,17 @@ class ExistenteController extends BaseController
                 ["fecha" => "DESC"]
             );
 
-        $data = [
-            "inventario" => $inventario,
-            "movimientos" => $movimientos
-        ];
-        return $this->apiResponse($data, 200, JSON_SIMPLE);
+        if(count($error) == 0) {
+            $data = [
+                "inventario" => $inventario,
+                "movimientos" => $movimientos
+            ];
+
+            $response = $this->apiResponse($data, 200, JSON_SIMPLE);
+        }
+        else
+            $response = $this->apiResponse($error, 404, JSON_SIMPLE);
+
+        return $response;
     }
 }

@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="InventarioBundle\Repository\MovimientoInventarioRepository")
  * @ORM\HasLifecycleCallbacks
  */
-class MovimientoInventario
+class MovimientoInventario implements \JsonSerializable
 {
     /**
      * @var int
@@ -241,4 +241,13 @@ class MovimientoInventario
     {
         $this->movimientosMateriales->removeElement($movimientosMateriale);
     }
+
+    function jsonSerialize()
+    {
+        return [
+            "id" => $this->getId(),
+        ];
+    }
+
+
 }
