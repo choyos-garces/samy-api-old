@@ -9,51 +9,39 @@
 namespace ControlPanelBundle\Controller;
 
 
-use JMS\Serializer\SerializerBuilder;
+use SamyBundle\Controller\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class OpcionesController
  * @package ControlPanelBundle\Controller
  * @Route("/opciones")
  */
-class OpcionesController extends Controller
+class OpcionesController extends BaseController
 {
     /**
      * @Route("/tiposMaterial")
      * @Method("GET")
-     * @return Response 
+     * @return JsonResponse
      */
     public function tiposMaterialAction() {
         $tiposMaterial = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "TIPO_MATERIAL"));
+        $response = $this->apiResponse($tiposMaterial);
 
-        $serializer = SerializerBuilder::create()->build();
-        $data = $serializer->serialize($tiposMaterial, "json");
-
-        $response = new Response();
-        $response->headers->set("Content-Type", "application/json");
-        $response->setContent($data);
-        
         return $response;
     }
 
     /**
      * @Route("/tiposIdentificacion")
      * @Method("GET")
-     * @return Response
+     * @return JsonResponse
      */
     public function tiposIdentificacionAction() {
-        $tiposMaterial = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "IDENTIFICACION"));
-
-        $serializer = SerializerBuilder::create()->build();
-        $data = $serializer->serialize($tiposMaterial, "json");
-
-        $response = new Response();
-        $response->headers->set("Content-Type", "application/json");
-        $response->setContent($data);
+        $tiposIdentificacion = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "IDENTIFICACION"));
+        $response = $this->apiResponse($tiposIdentificacion);
 
         return $response;
     }
@@ -61,17 +49,11 @@ class OpcionesController extends Controller
     /**
      * @Route("/tiposProductosPlantacion")
      * @Method("GET")
-     * @return Response
+     * @return JsonResponse
      */
     public function tipoProductoPlantacionAction() {
-        $tiposMaterial = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "PLANTACION_DETALLE"));
-
-        $serializer = SerializerBuilder::create()->build();
-        $data = $serializer->serialize($tiposMaterial, "json");
-
-        $response = new Response();
-        $response->headers->set("Content-Type", "application/json");
-        $response->setContent($data);
+        $plantacionDetalle = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "PLANTACION_DETALLE"));
+        $response = $this->apiResponse($plantacionDetalle);
 
         return $response;
     }
@@ -79,17 +61,11 @@ class OpcionesController extends Controller
     /**
      * @Route("/productosPlantacion")
      * @Method("GET")
-     * @return Response
+     * @return JsonResponse
      */
     public function productosPlantacionAction() {
-        $tiposMaterial = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "TIPO_PLANTACION"));
-
-        $serializer = SerializerBuilder::create()->build();
-        $data = $serializer->serialize($tiposMaterial, "json");
-
-        $response = new Response();
-        $response->headers->set("Content-Type", "application/json");
-        $response->setContent($data);
+        $tiposPlantacion = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "TIPO_PLANTACION"));
+        $response = $this->apiResponse($tiposPlantacion);
 
         return $response;
     }
@@ -97,18 +73,25 @@ class OpcionesController extends Controller
     /**
      * @Route("/unidadesArea")
      * @Method("GET")
-     * @return Response
+     * @return JsonResponse
      */
     public function unidadesAreaAction() {
-        $tiposMaterial = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "UNIDADES_AREA"));
-
-        $serializer = SerializerBuilder::create()->build();
-        $data = $serializer->serialize($tiposMaterial, "json");
-
-        $response = new Response();
-        $response->headers->set("Content-Type", "application/json");
-        $response->setContent($data);
+        $unidades = $this->getDoctrine()->getRepository('ControlPanelBundle:TipoOpcion')->findBy(array("grupo" => "UNIDADES_AREA"));
+        $response = $this->apiResponse($unidades);
 
         return $response;
     }
+
+    /**
+     * @Route("/motivosMovimientoInventario")
+     * @Method("GET")
+     * @return JsonResponse
+     */
+    public function motivoMovimientoInventarioAction() {
+        $motivosMovimeinoInventario = $this->getDoctrine()->getRepository('ControlPanelBundle:MotivoMovimientoInventario')->findAll();
+
+        $response = $this->apiResponse($motivosMovimeinoInventario);
+        return $response;
+    }
+
 }

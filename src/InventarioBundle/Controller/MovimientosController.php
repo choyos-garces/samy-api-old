@@ -101,7 +101,7 @@ class MovimientosController extends BaseController
                 if($inventario) {
                     $inventarioExistente  = floatval($inventario->getCantidad());
                     // 0 es Egreso; 1 es Ingreso
-                    if($payload->tipoMovimiento == 0 && $inventarioExistente < $movimientoMaterial->cantidad ) $error = "No hay suficiente material {$material->getId()}:{$material->getNombre()}";
+                    if($payload->tipoMovimiento == 0 && $inventarioExistente < $movimientoMaterial->cantidad ) $error = "ERROR:: No hay inventario sufficiente de  {$material->getNombre()}(id:{$material->getId()}:) para la transacción.";
                     else if($payload->tipoMovimiento == 0 && $inventarioExistente >= $movimientoMaterial->cantidad ) {
                         $nuevoInventario = $inventarioExistente - $movimientoMaterial->cantidad;
                         $inventario->setCantidad($nuevoInventario);
@@ -114,7 +114,7 @@ class MovimientosController extends BaseController
                 else
                 {
                     $inventarioExistente = 0;
-                    if($payload->tipoMovimiento == 0) $error = "No existe Inventario para este material {$material->getId()}:{$material->getNombre()}";
+                    if($payload->tipoMovimiento == 0) $error = "ERROR:: No hay inventario sufficiente de  {$material->getNombre()}(id:{$material->getId()}:) para la transacción.";
                     if($payload->tipoMovimiento == 1 ) {
                         $inventario = new InventarioMaterial();
                         $inventario->setCantidad($movimientoMaterial->cantidad);
@@ -125,7 +125,7 @@ class MovimientosController extends BaseController
             }
             else
             {
-                $error ="Material {$material->getId()}:{$material->getNombre()} o bodega {$bodega->getId()}:{$bodega->getNombre()} no existen";
+                $error ="ERROR:: Material {$material->getNombre()}(id:{$material->getId()}:) o Bodega {$bodega->getNombre()}(id:{$bodega->getId()}) no existen";
             }
 
             // Si no hubo errores:
