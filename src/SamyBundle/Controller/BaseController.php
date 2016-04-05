@@ -42,4 +42,20 @@ class BaseController extends Controller
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
     }
+
+    protected function sendMail($subject, $to, $view, $data) {
+        $message = \Swift_Message::newInstance()
+            ->setSubject($subject)
+            ->setFrom('robot@hygagro.com')
+            ->setTo($to)
+            ->setBody(
+                $this->renderView(
+                    $view,
+                    array('data' => $data)
+                ),
+                'text/html'
+            );
+        
+        $this->get('mailer')->send($message);
+    }
 }

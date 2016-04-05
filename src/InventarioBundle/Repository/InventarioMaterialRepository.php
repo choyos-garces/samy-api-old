@@ -1,6 +1,9 @@
 <?php
 
 namespace InventarioBundle\Repository;
+
+use AdministracionBundle\Entity\Bodega;
+use AdministracionBundle\Entity\Material;
 use Doctrine\ORM\EntityRepository;
 use InventarioBundle\Entity\InventarioMaterial;
 
@@ -29,11 +32,21 @@ class InventarioMaterialRepository extends EntityRepository
     }
 
 
-    public function lazyLoadAll() {
-        return $this->createQueryBuilder('i')
-            ->select(array("i.bodega as bodega", "i.material as material", "i.cantidad"))
-            ->join('i.bodega', 'b')
-            ->join('i.material', 'm')
-            ->getQuery()->getResult();
+    public function findByBodega(Bodega $bodega) {
+        return $this->createQueryBuilder('p')
+            ->where('p.bodega = :bodega')
+            ->andWhere('p.cantidad != 0')
+            ->setParameter('bodega', $bodega)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByMaterial(Material $material) {
+        return $this->createQueryBuilder('p')
+            ->where('p.material = :material')
+            ->andWhere('p.cantidad != 0')
+            ->setParameter('material', $material)
+            ->getQuery()
+            ->getResult();
     }
 }

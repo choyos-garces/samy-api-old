@@ -1,0 +1,47 @@
+<html>
+<body>
+<div style="font-family: 'Trebuchet MS', Helvetica, sans-serif; padding: 6px 12px;">
+    <h2 style="margin: .8em 0 .4em">Notificacion de {{ (data.getTipoMovimiento() == 1) ? 'Ingreso' : 'Egreso' }} de Inventario #{{ data.id }}</h2>
+    <small style="color: #787878;">
+        Este correro es generado autom&aacute;tica. Por favor no responder al mismo. Cualquier duda hacerla a
+        <a href="mailto:info@hoyosgarces.com">info@hoyosgarces.com</a>. Muchas Gracias.
+    </small>
+    <h3 style="margin: .8em 0 .4em">Datos del Movimiento</h3>
+    <table style="color: #424242;">
+        <tr>
+            <th style="text-align: right; padding-right: 12px">Tipo</th>
+            <td style="text-align: left">{{ (data.getTipoMovimiento() == 1) ? 'Ingreso' : 'Egreso' }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: right; padding-right: 12px">Bodega</th>
+            <td style="text-align: left">{{ data.getBodega().getNombre() }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: right; padding-right: 12px">Motivo</th>
+            <td style="text-align: left">{{ data.getMotivoMovimiento().getNombre() }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: right; padding-right: 12px">Fecha</th>
+            <td style="text-align: left">{{ data.fecha | date("g:ia d/m/Y") }}</td>
+        </tr>
+    </table>
+    <h3 style="margin: .8em 0 .4em">Movimiento de Materiales</h3>
+    <table style="color: #424242; border-collapse: collapse; table-layout: fixed; width: 100%" class="info">
+        <tr>
+            <th style="text-align: left; border-bottom: 2px solid #dcdcdc; padding: 8px 6px">Material</th>
+            <th style="text-align: left; border-bottom: 2px solid #dcdcdc; padding: 8px 6px">Tipo</th>
+            <th style="text-align: center; border-bottom: 2px solid #dcdcdc; padding: 8px 6px">Previa</th>
+            <th style="text-align: center; border-bottom: 2px solid #dcdcdc; padding: 8px 6px">Cantidad</th>
+        </tr>
+    {% for movimeintoMaterial in data.getMovimientosMateriales() %}
+        <tr>
+            <td style="border-bottom: 1px solid #dcdcdc;  padding: 8px 6px">{{ movimeintoMaterial.getMaterial().nombre }}</td>
+            <td style="border-bottom: 1px solid #dcdcdc;  padding: 8px 6px">{{ movimeintoMaterial.getMaterial().getTipoMaterial().nombre }}</td>
+            <td style="text-align: center; border-bottom: 1px solid #dcdcdc;  padding: 8px 6px">{{ movimeintoMaterial.cantidadPrevia }}</td>
+            <td style="text-align: center; border-bottom: 1px solid #dcdcdc;  padding: 8px 6px">{{  (data.tipoMovimiento == 1) ? '+' : '-' }}{{ movimeintoMaterial.cantidad }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+</body>
+</html>

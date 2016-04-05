@@ -178,9 +178,18 @@ class MovimientosController extends BaseController
                 "inventario_movimiento_ver",
                 ["id" => $movimiento->getId()]
             );
-
+            
             $response = $this->apiResponse($movimiento, 201);
             $response->headers->set("Location", $movimeintoURL);
+
+
+            $this->sendMail(
+                "Do not reply: Notificacion de Movimiento de Inventario",
+                "choyos.garces@gmail.com",
+                "@Inventario/Movimientos/ingresarAction.html.twig",
+                $movimiento
+            );
+
         }
         else {
            $response = $this->apiResponse($errors, 400);
