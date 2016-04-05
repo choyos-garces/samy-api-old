@@ -101,27 +101,22 @@ class ExistenteController extends BaseController
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function bodegaAction($id) {
-        $error = [];
-
         $bodega = $this->getDoctrine()
             ->getRepository("AdministracionBundle:Bodega")
             ->findOneBy(["id" => $id]);
 
-        if(!$bodega) $error[] = "Bodega con id:{$id} no fue encontrada.";
+        if($bodega) {
+            $inventarios = $this->getDoctrine()
+                ->getRepository("InventarioBundle:InventarioMaterial")
+                ->findByBodega($bodega);
 
-        $inventarios = $this->getDoctrine()
-            ->getRepository("InventarioBundle:InventarioMaterial")
-            ->findByBodega($bodega);
-
-        if(count($error) == 0) {
-            $data = [
-                "inventarios" => $inventarios
-            ];
-
+            $data = ["inventarios" => $inventarios];
             $response = $this->apiResponse($data);
         }
         else
-            $response = $this->apiResponse($error, 400);
+        {
+            $response = $this->apiResponse("Inventario no encontrado (b:id).", 400);
+        }
 
         return $response;
     }
@@ -133,27 +128,21 @@ class ExistenteController extends BaseController
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function MaterialAction($id) {
-        $error = [];
-
         $material = $this->getDoctrine()
             ->getRepository("AdministracionBundle:Material")
             ->findOneBy(["id" => $id]);
 
-        if(!$material) $error[] = "Material con id:{$id} no fue encontrado.";
+        if($material) {
+            $inventarios = $this->getDoctrine()
+                ->getRepository("InventarioBundle:InventarioMaterial")
+                ->findByMaterial($material);
 
-        $inventarios = $this->getDoctrine()
-            ->getRepository("InventarioBundle:InventarioMaterial")
-            ->findByMaterial($material);
-
-        if(count($error) == 0) {
-            $data = [
-                "inventarios" => $inventarios
-            ];
-
+            $data = ["inventarios" => $inventarios];
             $response = $this->apiResponse($data);
         }
-        else
-            $response = $this->apiResponse($error, 400);
+        else {
+            $response = $this->apiResponse("Inventario no encontrado (b:id).", 400);
+        }
 
         return $response;
     }

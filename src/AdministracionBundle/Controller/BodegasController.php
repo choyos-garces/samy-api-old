@@ -31,9 +31,10 @@ class BodegasController extends BaseController
      * @Method("Get")
      */
     public function indexAction() {
-        $bodega = $this->getDoctrine()->getRepository('AdministracionBundle:Bodega')->findAll();
+        $bodegas = $this->getDoctrine()->getRepository('AdministracionBundle:Bodega')->findAll();
 
-        $response = $this->apiResponse($bodega);
+        $response = $this->apiResponse($bodegas);
+
         return $response;
     }
 
@@ -45,8 +46,12 @@ class BodegasController extends BaseController
      */
     public function verAction($id) {
         $bodegas = $this->getDoctrine()->getRepository('AdministracionBundle:Bodega')->findOneBy(array("id" => $id));
-        
-        $response = $this->apiResponse($bodegas);
+
+        if($bodegas)
+            $response = $this->apiResponse($bodegas);
+        else
+            $response = $this->apiResponse("Bodega con id:{$id} no encontrada.", 404);
+
         return $response;
     }
 
