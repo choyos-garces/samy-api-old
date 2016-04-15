@@ -4,7 +4,6 @@ namespace InventarioBundle\Entity;
 
 use AdministracionBundle\Entity\Bodega;
 use ControlPanelBundle\Entity\MotivoMovimientoInventario;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -14,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="InventarioBundle\Repository\MovimientoInventarioRepository")
  * @ORM\HasLifecycleCallbacks
  */
-class MovimientoInventario
+class MovimientoInventario implements \JsonSerializable
 {
     /**
      * @var int
@@ -49,6 +48,17 @@ class MovimientoInventario
      * @ORM\OneToMany(targetEntity="InventarioBundle\Entity\MovimientoMaterial", mappedBy="movimientoInventario", cascade={"persist"})
      */
     private $movimientosMateriales;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text")
+     */
+    private $notas;
+
+    /**
+     * @ORM\OneToOne(targetEntity="InventarioBundle\Entity\MovimientoInventarioDetalle")
+     */
+    private $detalle;
     
     /**
      * @var \DateTime
@@ -218,4 +228,37 @@ class MovimientoInventario
     {
         return $this->movimientosMateriales;
     }
+
+    /**
+     * Add movimientosMateriale
+     *
+     * @param \InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale
+     *
+     * @return MovimientoInventario
+     */
+    public function addMovimientosMateriale(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
+    {
+        $this->movimientosMateriales[] = $movimientosMateriale;
+
+        return $this;
+    }
+
+    /**
+     * Remove movimientosMateriale
+     *
+     * @param \InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale
+     */
+    public function removeMovimientosMateriale(\InventarioBundle\Entity\MovimientoMaterial $movimientosMateriale)
+    {
+        $this->movimientosMateriales->removeElement($movimientosMateriale);
+    }
+
+    function jsonSerialize()
+    {
+        return [
+            "id" => $this->getId(),
+        ];
+    }
+
+
 }

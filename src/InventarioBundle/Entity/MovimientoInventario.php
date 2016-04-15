@@ -48,6 +48,17 @@ class MovimientoInventario implements \JsonSerializable
      * @ORM\OneToMany(targetEntity="InventarioBundle\Entity\MovimientoMaterial", mappedBy="movimientoInventario", cascade={"persist"})
      */
     private $movimientosMateriales;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text")
+     */
+    private $notas;
+
+    /**
+     * @ORM\OneToOne(targetEntity="InventarioBundle\Entity\MovimientoInventarioDetalle")
+     */
+    private $detalle;
     
     /**
      * @var \DateTime
@@ -250,4 +261,52 @@ class MovimientoInventario implements \JsonSerializable
     }
 
 
+
+    /**
+     * Set notas
+     *
+     * @param string $notas
+     *
+     * @return MovimientoInventario
+     */
+    public function setNotas($notas)
+    {
+        $this->notas = $notas;
+
+        return $this;
+    }
+
+    /**
+     * Get notas
+     *
+     * @return string
+     */
+    public function getNotas()
+    {
+        return $this->notas;
+    }
+
+    /**
+     * Set detalle
+     *
+     * @param \InventarioBundle\Entity\MovimientoInventarioDetalle $detalle
+     *
+     * @return MovimientoInventario
+     */
+    public function setDetalle(\InventarioBundle\Entity\MovimientoInventarioDetalle $detalle = null)
+    {
+        $this->detalle = $detalle;
+
+        return $this;
+    }
+
+    /**
+     * Get detalle
+     *
+     * @return \InventarioBundle\Entity\MovimientoInventarioDetalle
+     */
+    public function getDetalle()
+    {
+        return $this->detalle;
+    }
 }

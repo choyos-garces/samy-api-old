@@ -251,4 +251,28 @@ class MovimientoMaterial implements \JsonSerializable
             "movimientoInventario" => $this->getMovimientoInventario()
         ];
     }
+
+    /**
+     * Set fecha
+     *
+     * @param \DateTime $fecha
+     *
+     * @return MovimientoMaterial
+     */
+    public function setFecha($fecha)
+    {
+        $this->fecha = $fecha;
+
+        return $this;
+    }
+
+    /**
+     * Get fecha
+     *
+     * @return \DateTime
+     */
+    public function getFecha()
+    {
+        return $this->fecha;
+    }
 }

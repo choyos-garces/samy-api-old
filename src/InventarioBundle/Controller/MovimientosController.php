@@ -72,7 +72,7 @@ class MovimientosController extends BaseController
         /** @var MovimientoMaterial[] $movimeintosMateriales */
         $movimeintosMateriales = [];
 
-        /** @var InventarioMaterial $inventarios */
+        /** @var array $inventarios */
         $inventarios = [];
         $errors = [];
 
@@ -101,7 +101,9 @@ class MovimientosController extends BaseController
                 if($inventario) {
                     $inventarioExistente  = floatval($inventario->getCantidad());
                     // 0 es Egreso; 1 es Ingreso
-                    if($payload->tipoMovimiento == 0 && $inventarioExistente < $movimientoMaterial->cantidad ) $error = "ERROR:: No hay inventario sufficiente de  {$material->getNombre()}(id:{$material->getId()}:) para la transacción.";
+                    if($payload->tipoMovimiento == 0 && $inventarioExistente < $movimientoMaterial->cantidad ) {
+                        $error = "No hay inventario sufficiente de {$material->getNombre()} (id:{$material->getId()}) para la transacción.";
+                    }
                     else if($payload->tipoMovimiento == 0 && $inventarioExistente >= $movimientoMaterial->cantidad ) {
                         $nuevoInventario = $inventarioExistente - $movimientoMaterial->cantidad;
                         $inventario->setCantidad($nuevoInventario);
@@ -114,7 +116,9 @@ class MovimientosController extends BaseController
                 else
                 {
                     $inventarioExistente = 0;
-                    if($payload->tipoMovimiento == 0) $error = "ERROR:: No hay inventario sufficiente de  {$material->getNombre()}(id:{$material->getId()}:) para la transacción.";
+                    if($payload->tipoMovimiento == 0) {
+                        $error = "No hay inventario sufficiente de {$material->getNombre()} (id:{$material->getId()}) para la transacción.";
+                    }
                     if($payload->tipoMovimiento == 1 ) {
                         $inventario = new InventarioMaterial();
                         $inventario->setCantidad($movimientoMaterial->cantidad);
@@ -125,7 +129,7 @@ class MovimientosController extends BaseController
             }
             else
             {
-                $error ="ERROR:: Material {$material->getNombre()}(id:{$material->getId()}:) o Bodega {$bodega->getNombre()}(id:{$bodega->getId()}) no existen";
+                $error ="Material {$material->getNombre()} (id:{$material->getId()}) o Bodega {$bodega->getNombre()} (id:{$bodega->getId()}) no existen";
             }
 
             // Si no hubo errores:
@@ -142,8 +146,9 @@ class MovimientosController extends BaseController
                 $movimeintosMateriales[] = $log;
                 $inventarios[] = $inventario;
             }
-            else
+            else {
                 $errors[] = $error;
+            }
         }
 
         if(count($errors) == 0 ) {
@@ -155,6 +160,7 @@ class MovimientosController extends BaseController
             $movimiento->setTipoMovimiento($payload->tipoMovimiento);
             $movimiento->setBodega($bodega);
             $movimiento->setMotivoMovimiento($motivoMovimiento);
+            $movimiento->setNotas($payload->notas);
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($movimiento);
@@ -163,6 +169,7 @@ class MovimientosController extends BaseController
             // a los movimeintos de materiales para el registro
             for($i = 0; $i < count($inventarios); $i++) {
                 $movimeintosMateriales[$i]->setMovimientoInventario($movimiento);
+
                 $em->persist($inventarios[$i]);
                 $em->persist($movimeintosMateriales[$i]);
             }
@@ -181,7 +188,6 @@ class MovimientosController extends BaseController
             
             $response = $this->apiResponse($movimiento, 201);
             $response->headers->set("Location", $movimeintoURL);
-
 
             $this->sendMail(
                 "Do not reply: Notificacion de Movimiento de Inventario",
