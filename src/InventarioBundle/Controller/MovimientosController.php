@@ -11,6 +11,7 @@ namespace InventarioBundle\Controller;
 use InventarioBundle\Entity\InventarioMaterial;
 use InventarioBundle\Entity\MovimientoInventario;
 
+use InventarioBundle\Entity\MovimientoInventarioDetalle;
 use InventarioBundle\Entity\MovimientoMaterial;
 use SamyBundle\Controller\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -68,7 +69,7 @@ class MovimientosController extends BaseController
      */
     public function ingresarAction(Request $request) {
         $payload = json_decode($request->getContent());
-
+        
         /** @var MovimientoMaterial[] $movimeintosMateriales */
         $movimeintosMateriales = [];
 
@@ -76,9 +77,34 @@ class MovimientosController extends BaseController
         $inventarios = [];
         $errors = [];
 
+        // Chequea que la bodega existe
         $bodega = $this->getDoctrine()
             ->getRepository("AdministracionBundle:Bodega")
             ->findOneBy(array("id" => $payload->bodega->id));
+
+        // Chequea datos del detalle
+        $detalles = new MovimientoInventarioDetalle();
+        switch ($payload->motivoMovimiento->id) {
+            case 1 :
+                $detalleProveedor = $this->getDoctrine()
+                    ->getRepository("AdministracionBundle:Empresa")
+                    ->findOneBy(["id" => $payload->detalles->proveedor->id]);
+
+                $detalles->setFactura($payload->detalles->factura);
+                $detalles->set
+                if(!$detalleProveedor) $errors [] = "Detalle de Proveedor equivocado";
+                break;
+            case 2 :
+                break;
+            case 3 :
+                break;
+            case 4 :
+                break;
+            case 5 :
+                break;
+            case 6 :
+                break;
+        }
 
         // Primero revisa el Request por el movimiento de material
         // Si no hay movimientos de materiales deberia retornar un error de inmediato
@@ -156,13 +182,16 @@ class MovimientosController extends BaseController
                 ->getRepository("ControlPanelBundle:MotivoMovimientoInventario")
                 ->findOneBy(array("id" => $payload->motivoMovimiento->id));
 
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($detalles);
+
             $movimiento = new MovimientoInventario();
             $movimiento->setTipoMovimiento($payload->tipoMovimiento);
             $movimiento->setBodega($bodega);
             $movimiento->setMotivoMovimiento($motivoMovimiento);
             $movimiento->setNotas($payload->notas);
+            $movimiento->setDetalle($detalles);
 
-            $em = $this->getDoctrine()->getManager();
             $em->persist($movimiento);
 
             // Persiste los nuevos valores para el invetario y asigna el nuevo movimiento inventario
