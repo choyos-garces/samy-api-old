@@ -22,7 +22,7 @@ class MovimientoInventarioDetalle
     private $id;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AdministracionBundle\Entity\Empresa")
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Empresa")
      * @ORM\JoinColumn(name="proveedor_id", referencedColumnName="id", nullable=true)
      */
     private $proveedor;
@@ -35,25 +35,14 @@ class MovimientoInventarioDetalle
     private $factura;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AdministracionBundle\Entity\Plantacion")
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Plantacion")
      * @ORM\JoinColumn(name="plantacion_id", referencedColumnName="id", nullable=true)
      */
     private $plantacion;
 
     /**
-     * @ORM\ManyToMany(targetEntity="AdministracionBundle\Entity\Bodega")
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Bodega")
      * @ORM\JoinColumn(name="bodega_id", referencedColumnName="id", nullable=true)
      */
     private $bodega;
-
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
 }
-

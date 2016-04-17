@@ -22,7 +22,7 @@ class MovimientoInventarioDetalle
     private $id;
 
     /**
-     * @ORM\OneToMany(targetEntity="AdministracionBundle\Entity\Empresa")
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Empresa")
      * @ORM\JoinColumn(name="proveedor_id", referencedColumnName="id", nullable=true)
      */
     private $proveedor;
@@ -35,14 +35,120 @@ class MovimientoInventarioDetalle
     private $factura;
 
     /**
-     * @ORM\OneToMany(targetEntity="AdministracionBundle\Entity\Plantacion")
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Plantacion")
      * @ORM\JoinColumn(name="plantacion_id", referencedColumnName="id", nullable=true)
      */
     private $plantacion;
 
     /**
-     * @ORM\OneToMany(targetEntity="AdministracionBundle\Entity\Bodega")
+     * @ORM\ManyToOne(targetEntity="AdministracionBundle\Entity\Bodega")
      * @ORM\JoinColumn(name="bodega_id", referencedColumnName="id", nullable=true)
      */
     private $bodega;
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set factura
+     *
+     * @param string $factura
+     *
+     * @return MovimientoInventarioDetalle
+     */
+    public function setFactura($factura)
+    {
+        $this->factura = $factura;
+
+        return $this;
+    }
+
+    /**
+     * Get factura
+     *
+     * @return string
+     */
+    public function getFactura()
+    {
+        return $this->factura;
+    }
+
+    /**
+     * Set proveedor
+     *
+     * @param \AdministracionBundle\Entity\Empresa $proveedor
+     *
+     * @return MovimientoInventarioDetalle
+     */
+    public function setProveedor(\AdministracionBundle\Entity\Empresa $proveedor = null)
+    {
+        $this->proveedor = $proveedor;
+
+        return $this;
+    }
+
+    /**
+     * Get proveedor
+     *
+     * @return \AdministracionBundle\Entity\Empresa
+     */
+    public function getProveedor()
+    {
+        return $this->proveedor;
+    }
+
+    /**
+     * Set plantacion
+     *
+     * @param \AdministracionBundle\Entity\Plantacion $plantacion
+     *
+     * @return MovimientoInventarioDetalle
+     */
+    public function setPlantacion(\AdministracionBundle\Entity\Plantacion $plantacion = null)
+    {
+        $this->plantacion = $plantacion;
+
+        return $this;
+    }
+
+    /**
+     * Get plantacion
+     *
+     * @return \AdministracionBundle\Entity\Plantacion
+     */
+    public function getPlantacion()
+    {
+        return $this->plantacion;
+    }
+
+    /**
+     * Set bodega
+     *
+     * @param \AdministracionBundle\Entity\Bodega $bodega
+     *
+     * @return MovimientoInventarioDetalle
+     */
+    public function setBodega(\AdministracionBundle\Entity\Bodega $bodega = null)
+    {
+        $this->bodega = $bodega;
+
+        return $this;
+    }
+
+    /**
+     * Get bodega
+     *
+     * @return \AdministracionBundle\Entity\Bodega
+     */
+    public function getBodega()
+    {
+        return $this->bodega;
+    }
 }

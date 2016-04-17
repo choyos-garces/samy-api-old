@@ -253,15 +253,6 @@ class MovimientoInventario implements \JsonSerializable
         $this->movimientosMateriales->removeElement($movimientosMateriale);
     }
 
-    function jsonSerialize()
-    {
-        return [
-            "id" => $this->getId(),
-        ];
-    }
-
-
-
     /**
      * Set notas
      *
@@ -308,5 +299,12 @@ class MovimientoInventario implements \JsonSerializable
     public function getDetalle()
     {
         return $this->detalle;
+    }
+    
+    function jsonSerialize()
+    {
+        return [
+            "id" => $this->getId()
+        ];
     }
 }

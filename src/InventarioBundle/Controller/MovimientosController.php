@@ -91,7 +91,7 @@ class MovimientosController extends BaseController
                     ->findOneBy(["id" => $payload->detalles->proveedor->id]);
 
                 $detalles->setFactura($payload->detalles->factura);
-                $detalles->set
+                $detalles->setProveedor($detalleProveedor);
                 if(!$detalleProveedor) $errors [] = "Detalle de Proveedor equivocado";
                 break;
             case 2 :
