@@ -16,8 +16,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class BaseController extends Controller
-{
+class BaseController extends Controller {
     
     protected function apiResponse($data, $statuscode = 200, $serializer = JSON_JMS)
     {
@@ -43,7 +42,7 @@ class BaseController extends Controller
         $form->submit($data);
     }
 
-    protected function sendMail($subject, $to, $view, $data) {
+    protected function sendMail($subject,array $to, $view, $data) {
         $message = \Swift_Message::newInstance()
             ->setSubject($subject)
             ->setFrom('robot@hygagro.com')
@@ -57,5 +56,23 @@ class BaseController extends Controller
             );
         
         $this->get('mailer')->send($message);
+    }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    protected function randomString($length) {
+        // Populates a list
+        $elements = array_merge(range("a", "y"), range("A","Y"), range(0,9));
+
+        // Starts the string
+        $string = "";
+        for($i = 0; $i < $length; $i++) {
+            $index = rand(0, count($elements)-1);
+            $string .= $elements[$index];
+        }
+        
+        return $string;
     }
 }

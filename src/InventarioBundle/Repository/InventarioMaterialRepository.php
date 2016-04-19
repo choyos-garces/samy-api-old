@@ -21,7 +21,7 @@ class InventarioMaterialRepository extends EntityRepository
      * @return InventarioMaterial
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
-    public function findByInventario($material, $bodega) {
+    public function findByInventario(Material $material, Bodega $bodega) {
         return $this->createQueryBuilder('p')
             ->where('p.material = :material')
             ->andWhere('p.bodega = :bodega')

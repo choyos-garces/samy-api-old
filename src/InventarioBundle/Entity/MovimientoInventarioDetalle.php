@@ -47,6 +47,11 @@ class MovimientoInventarioDetalle
     private $bodega;
 
     /**
+     * @ORM\Column(type="string", length=8, nullable=true)
+     */
+    private $confirmacion;
+    
+    /**
      * Get id
      *
      * @return integer
@@ -150,5 +155,29 @@ class MovimientoInventarioDetalle
     public function getBodega()
     {
         return $this->bodega;
+    }
+
+    /**
+     * Set confirmacion
+     *
+     * @param string $confirmacion
+     *
+     * @return MovimientoInventarioDetalle
+     */
+    public function setConfirmacion($confirmacion)
+    {
+        $this->confirmacion = $confirmacion;
+
+        return $this;
+    }
+
+    /**
+     * Get confirmacion
+     *
+     * @return string
+     */
+    public function getConfirmacion()
+    {
+        return $this->confirmacion;
     }
 }

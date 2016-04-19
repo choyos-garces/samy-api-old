@@ -8,6 +8,9 @@
 
 namespace InventarioBundle\Controller;
 
+use AdministracionBundle\Entity\Bodega;
+use AdministracionBundle\Entity\Material;
+use ControlPanelBundle\Entity\MotivoMovimientoInventario;
 use InventarioBundle\Entity\InventarioMaterial;
 use InventarioBundle\Entity\MovimientoInventario;
 
@@ -70,127 +73,87 @@ class MovimientosController extends BaseController
     public function ingresarAction(Request $request) {
         $payload = json_decode($request->getContent());
         
-        /** @var MovimientoMaterial[] $movimeintosMateriales */
+        // Para evitar problemas inicializa los arrays necesarios para el proceso
         $movimeintosMateriales = [];
-
-        /** @var array $inventarios */
         $inventarios = [];
-        $errors = [];
+        $errores = [];
 
-        // Chequea que la bodega existe
+        // Chequea datos del detalle
+        $motivoMovimiento = $this->getDoctrine()
+            ->getRepository("ControlPanelBundle:MotivoMovimientoInventario")
+            ->findOneBy(array("id" => $payload->motivoMovimiento->id));
+        
+        // Chequea que la bodega en el request exista
         $bodega = $this->getDoctrine()
             ->getRepository("AdministracionBundle:Bodega")
             ->findOneBy(array("id" => $payload->bodega->id));
-
-        // Chequea datos del detalle
-        $detalles = new MovimientoInventarioDetalle();
-        switch ($payload->motivoMovimiento->id) {
-            case 1 :
-                $detalleProveedor = $this->getDoctrine()
-                    ->getRepository("AdministracionBundle:Empresa")
-                    ->findOneBy(["id" => $payload->detalles->proveedor->id]);
-
-                $detalles->setFactura($payload->detalles->factura);
-                $detalles->setProveedor($detalleProveedor);
-                if(!$detalleProveedor) $errors [] = "Detalle de Proveedor equivocado";
-                break;
-            case 2 :
-                break;
-            case 3 :
-                break;
-            case 4 :
-                break;
-            case 5 :
-                break;
-            case 6 :
-                break;
-        }
-
-        // Primero revisa el Request por el movimiento de material
-        // Si no hay movimientos de materiales deberia retornar un error de inmediato
-        foreach ($payload->movimientosMateriales as $movimientoMaterial)
+        
+        //Feedback de la bodega
+        if($bodega == null)
+            $errores[] = "Bodega {$payload->bodega->nombre} (id:{$payload->bodega->id}) no existe.";
+        
+        // Itera la lista de movimientos de material en el request
+        foreach ($payload->movimientosMateriales as $mm)
         {
-            $error = false;
+            $error = null;
+            $tipo = $payload->tipoMovimiento;
+            $cantidad = $mm->cantidad;
+            
+            // Revisa que el material en request exista
             $material = $this->getDoctrine()
                 ->getRepository("AdministracionBundle:Material")
-                ->findOneBy(array("id" => $movimientoMaterial->material->id));
-
-            if($material && $bodega) {
-
-                $inventario = $this->getDoctrine()
-                    ->getRepository("InventarioBundle:InventarioMaterial")
-                    ->findOneBy(array(
-                        "material" => $material,
-                        "bodega" => $bodega
-                    ));
-
-                if($inventario) {
-                    $inventarioExistente  = floatval($inventario->getCantidad());
-                    // 0 es Egreso; 1 es Ingreso
-                    if($payload->tipoMovimiento == 0 && $inventarioExistente < $movimientoMaterial->cantidad ) {
-                        $error = "No hay inventario sufficiente de {$material->getNombre()} (id:{$material->getId()}) para la transacción.";
-                    }
-                    else if($payload->tipoMovimiento == 0 && $inventarioExistente >= $movimientoMaterial->cantidad ) {
-                        $nuevoInventario = $inventarioExistente - $movimientoMaterial->cantidad;
-                        $inventario->setCantidad($nuevoInventario);
-                    }
-                    if($payload->tipoMovimiento == 1 ) {
-                        $nuevoInventario = $inventarioExistente + $movimientoMaterial->cantidad;
-                        $inventario->setCantidad($nuevoInventario);
-                    }
-                }
-                else
-                {
-                    $inventarioExistente = 0;
-                    if($payload->tipoMovimiento == 0) {
-                        $error = "No hay inventario sufficiente de {$material->getNombre()} (id:{$material->getId()}) para la transacción.";
-                    }
-                    if($payload->tipoMovimiento == 1 ) {
-                        $inventario = new InventarioMaterial();
-                        $inventario->setCantidad($movimientoMaterial->cantidad);
-                        $inventario->setMaterial($material);
-                        $inventario->setBodega($bodega);
-                    }
-                }
-            }
-            else
-            {
-                $error ="Material {$material->getNombre()} (id:{$material->getId()}) o Bodega {$bodega->getNombre()} (id:{$bodega->getId()}) no existen";
-            }
-
+                ->findOneBy(array("id" => $mm->material->id));
+            
+            // Feedback del material
+            if($material == null)
+                $error = "Material {$mm->material->nombre} (id:{$mm->material->id}) no existe.";
+            
             // Si no hubo errores:
+            // - Chequear el inventario
             // - Genrar un movimiento de material
             // - Preparar el nuevo inventario de material para persistir
-            if($error == false) {
-                $log = new MovimientoMaterial();
-                $log->setTipoMovimiento($payload->tipoMovimiento);
-                $log->setBodega($bodega);
-                $log->setMaterial($material);
-                $log->setCantidadPrevia($inventarioExistente);
-                $log->setCantidad($movimientoMaterial->cantidad);
-
-                $movimeintosMateriales[] = $log;
-                $inventarios[] = $inventario;
+            if($error == null) {
+                $inventario = $this->checkoutInventario($bodega, $material, $cantidad, $tipo);
+                
+                if($inventario) {
+                    $cantidadNueva = floatval($inventario->getCantidad());
+                    $cantidadPrevia = ($tipo) ? $cantidadNueva - $cantidad : $cantidadNueva + $cantidad;
+                    $movimientoMaterial = new MovimientoMaterial();
+                    $movimientoMaterial->setTipoMovimiento($tipo);
+                    $movimientoMaterial->setBodega($bodega);
+                    $movimientoMaterial->setMaterial($material);
+                    $movimientoMaterial->setCantidadPrevia($cantidadPrevia);
+                    $movimientoMaterial->setCantidad($cantidad);
+                    $movimeintosMateriales[] = $movimientoMaterial;
+                    $inventarios[] = $inventario;
+                }
+                else {
+                    $errores[] = "No hay suficiente Inventario de {$material->getNombre()} en la bodega {$bodega->getNombre()}.";
+                }
             }
             else {
-                $errors[] = $error;
+                $errores[] = $error;
             }
         }
 
-        if(count($errors) == 0 ) {
-            $motivoMovimiento = $this->getDoctrine()
-                ->getRepository("ControlPanelBundle:MotivoMovimientoInventario")
-                ->findOneBy(array("id" => $payload->motivoMovimiento->id));
+        // Chequea los detalles del formulario
+        $detalle = $this->handleDetalleMovimiento($motivoMovimiento, $payload->detalle, $bodega);
+        if(is_array($detalle)) $errores [] = array_merge($errores, $detalle);
 
+        // Si no hay errores
+        // Cominenza a Persistir la informacion generada en la base de datos
+        if(count($errores) == 0 ) {
+            // Persiste Detalles del Movimiento
             $em = $this->getDoctrine()->getManager();
-            $em->persist($detalles);
+            $em->persist($detalle);
 
+            // Persiste el movimiento
             $movimiento = new MovimientoInventario();
             $movimiento->setTipoMovimiento($payload->tipoMovimiento);
             $movimiento->setBodega($bodega);
             $movimiento->setMotivoMovimiento($motivoMovimiento);
             $movimiento->setNotas($payload->notas);
-            $movimiento->setDetalle($detalles);
+            $movimiento->setDetalle($detalle);
 
             $em->persist($movimiento);
 
@@ -209,28 +172,156 @@ class MovimientosController extends BaseController
             $movimiento = $this->getDoctrine()
                 ->getRepository("InventarioBundle:MovimientoInventario")
                 ->findOneBy(array("id" => $movimiento->getId()));
-
             $movimeintoURL = $this->generateUrl(
                 "inventario_movimiento_ver",
                 ["id" => $movimiento->getId()]
             );
+
+            $this->handleIngresoInventarioFeedback($movimiento);
             
             $response = $this->apiResponse($movimiento, 201);
             $response->headers->set("Location", $movimeintoURL);
-
-            $this->sendMail(
-                "Do not reply: Notificacion de Movimiento de Inventario",
-                "choyos.garces@gmail.com",
-                "@Inventario/Movimientos/ingresarAction.html.twig",
-                $movimiento
-            );
-
         }
         else {
-           $response = $this->apiResponse($errors, 400);
+           $response = $this->apiResponse($errores, 400);
         }
 
         return $response;
     }
     
+    /**
+     * @param Bodega $bodega
+     * @param Material $material
+     * @param float $cantidad
+     * @param int $tipo Donde 1 es ingreso y 0 egreso
+     * @return InventarioMaterial|null
+     */
+    private function checkoutInventario(Bodega $bodega, Material $material, $cantidad, $tipo) {
+        $inventario = $this->getDoctrine()
+            ->getRepository("InventarioBundle:InventarioMaterial")
+            ->findByInventario($material, $bodega);
+
+        if($inventario) {
+            $cantidadExistente = floatval($inventario->getCantidad());
+
+            if($tipo == 1) $nuevaCantidad = $cantidadExistente + $cantidad;
+            elseif ( $tipo == 0 && $cantidadExistente >= $cantidad) $nuevaCantidad = $cantidadExistente - $cantidad;
+            else return null;
+
+            $inventario->setCantidad($nuevaCantidad);
+            return $inventario;
+        }
+        else {
+            return null;
+        }
+    }
+
+    /**
+     * @param MotivoMovimientoInventario $motivo
+     * @param Bodega $bodega
+     * @param \stdClass $payload
+     * @return MovimientoInventarioDetalle|string
+     */
+    private function handleDetalleMovimiento(MotivoMovimientoInventario $motivo, \stdClass $payload, Bodega $bodega) {
+        $detalle = new MovimientoInventarioDetalle();
+        $errores = [];
+
+        switch ($motivo->getId()) {
+            case 1 : // Ingreso por proveedor
+                $proveedor = $this->getDoctrine()
+                    ->getRepository("AdministracionBundle:Empresa")
+                    ->findOneBy(["id" => $payload->proveedor->id]);
+
+                if($proveedor == null) {
+                    $errores[] = "Proveedor selecionado no es válido.";
+                }
+                else {
+                    $detalle->setFactura($payload->factura);
+                    $detalle->setProveedor($proveedor);
+                }
+
+                break;
+            case 2 : // Ingreso desde una Bodega
+                $bodegaOrigen = $this->getDoctrine()
+                    ->getRepository("AdministracionBundle:Bodega")
+                    ->findOneBy(["id" => $payload->bodega->id]);
+
+                if($bodegaOrigen == null ) {
+                    $errores[] = "Bodega selecionada no es válida.";
+                }
+                else {
+                    $confirmacion = $payload->confirmacion;
+                    $confirmacionOrigen = $this->getDoctrine()
+                        ->getRepository("InventarioBundle:MovimientoInventarioDetalle")
+                        ->findOneBy(array(
+                            "confirmacion" => $confirmacion,
+                            "bodega" => $bodega
+                        ));
+                    if($confirmacionOrigen == null) {
+                        $errores[] = "No Existe una transferencia pendiente con ese numero de confirmación para la bodega {$bodega->getNombre()}.";
+                    }
+                    elseif(strcmp($confirmacion, $confirmacionOrigen->getConfirmacion()) == 0) {
+                        $detalle->setBodega($bodega);
+                        $detalle->setConfirmacion($confirmacion);
+                    }
+                    else {
+                        $errores[] = "Número de confirmación {$confirmacion} inválido.";
+                    }
+                }
+                
+                break;
+            case 3 :
+                
+                break;
+            case 4 : // Egreso a un productor
+                     
+                break;
+            case 5 : // Egreso a una bodega
+                $bodega = $this->getDoctrine()
+                    ->getRepository("AdministracionBundle:Bodega")
+                    ->findOneBy(["id" => $payload->bodega->id]);
+
+                if($bodega == null) {
+                    $errores[] = "Bodega selecionada es inválida.";
+                }
+                else {
+                    $confirmacion = $this->randomString(8);
+                    $detalle->setBodega($bodega);
+                    $detalle->setConfirmacion($confirmacion);
+                }
+                
+                break;
+            case 6 :
+                $proveedor = $this->getDoctrine()
+                    ->getRepository("AdministracionBundle:Empresa")
+                    ->findOneBy(["id" => $payload->proveedor->id]);
+
+                if($proveedor == null)
+                {
+                    $errores[] = "Proveedor selecionado es inválido.";
+                }
+                else {
+                    $detalle->setProveedor($proveedor);
+                }
+                
+                break;
+        }
+
+        return (count($errores) == 0) ? $errores : $detalle;
+    }
+
+    /**
+     * @param MovimientoInventario $movimiento
+     */
+    private function handleIngresoInventarioFeedback(MovimientoInventario $movimiento) {
+        $motivo = $movimiento->getMotivoMovimiento()->getId();
+
+        // Siempre manda un correo al contador
+        $this->sendMail(
+            "Notificacion de Movimiento de Inventario",
+            [$this->getParameter("contador")],
+            "@Inventario/Movimientos/ingresarAction.html.twig", $movimiento
+        );
+        
+    }
 }
