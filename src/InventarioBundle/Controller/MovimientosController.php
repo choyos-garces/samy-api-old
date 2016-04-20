@@ -72,7 +72,6 @@ class MovimientosController extends BaseController
      */
     public function ingresarAction(Request $request) {
         $payload = json_decode($request->getContent());
-        
         // Para evitar problemas inicializa los arrays necesarios para el proceso
         $movimeintosMateriales = [];
         $inventarios = [];
@@ -82,15 +81,17 @@ class MovimientosController extends BaseController
         $motivoMovimiento = $this->getDoctrine()
             ->getRepository("ControlPanelBundle:MotivoMovimientoInventario")
             ->findOneBy(array("id" => $payload->motivoMovimiento->id));
-        
+
+        // Feedback de motivoMovimiento
+        if($motivoMovimiento == null) $errores[] = "Error en el formulario.";
+
         // Chequea que la bodega en el request exista
         $bodega = $this->getDoctrine()
             ->getRepository("AdministracionBundle:Bodega")
             ->findOneBy(array("id" => $payload->bodega->id));
         
         //Feedback de la bodega
-        if($bodega == null)
-            $errores[] = "Bodega {$payload->bodega->nombre} (id:{$payload->bodega->id}) no existe.";
+        if($bodega == null) $errores[] = "Bodega {$payload->bodega->nombre} (id:{$payload->bodega->id}) no existe.";
         
         // Itera la lista de movimientos de material en el request
         foreach ($payload->movimientosMateriales as $mm)
@@ -105,8 +106,7 @@ class MovimientosController extends BaseController
                 ->findOneBy(array("id" => $mm->material->id));
             
             // Feedback del material
-            if($material == null)
-                $error = "Material {$mm->material->nombre} (id:{$mm->material->id}) no existe.";
+            if($material == null) $error = "Material {$mm->material->nombre} (id:{$mm->material->id}) no existe.";
             
             // Si no hubo errores:
             // - Chequear el inventario
@@ -307,7 +307,7 @@ class MovimientosController extends BaseController
                 break;
         }
 
-        return (count($errores) == 0) ? $errores : $detalle;
+        return (count($errores) == 0) ? $detalle : $errores;
     }
 
     /**
