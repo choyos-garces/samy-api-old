@@ -1,0 +1,70 @@
+{% extends ':default:baseMail.html.twig' %}
+
+{% block title %}
+    Notificacion de {{ (data.getTipoMovimiento() == 1) ? 'Ingreso' : 'Egreso' }} de Inventario #{{ data.id }}
+{% endblock %}
+
+{% block body %}
+    <h3 style="margin: .8em 0 .4em; font-size: 18px">Datos del Movimiento</h3>
+    <div style="box-sizing: border-box ;width: 100%; clear: both">
+        <div style="width: 50%; float: left">
+            <dl>
+                <dt style="font-weight: bold; margin-bottom: .3em">Tipo</dt>
+                <dd style="margin: 0 .6em .6em">{{ (data.tipoMovimiento == 1) ? 'Ingreso' : 'Egreso' }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Bodega</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.bodega.nombre }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Motivo</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.motivoMovimiento.nombre }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Fecha</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.fecha | date("g:ia d/m/Y") }}</dd>
+            </dl>
+        </div>
+        <div style="width: 50%; float: left">
+            <dl>
+            {% if data.motivoMovimiento.id == 1 %}
+                <dt style="font-weight: bold; margin-bottom: .3em">Tipo</dt>
+                <dd style="margin: 0 .6em .6em">{{ (data.tipoMovimiento == 1) ? 'Ingreso' : 'Egreso' }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Bodega</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.bodega.nombre }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Motivo</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.motivoMovimiento.nombre }}</dd>
+            {% endif %}
+            {% if (data.motivoMovimiento.id == 5 or data.motivoMovimiento.id == 2) %}
+                <dt style="font-weight: bold; margin-bottom: .3em">Bodegao</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.detalle.bodega.nombre }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Numero de Confirmaci&oacute;n</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.detalle.confirmacion }}</dd>
+            {% endif %}
+                <dt style="font-weight: bold; margin-bottom: .3em">Observaciones y Notas</dt>
+                <dd style="margin: 0 .6em .6em"><pre>{{ data.notas }}</pre></dd>
+            </dl>
+        </div>
+    </div>
+    <div style="clear: both">
+        <h3 style="margin: .8em 0 .4em; font-size: 18px">Movimiento de Materiales</h3>
+        <table style="border-collapse: collapse; width: 100%; font-size: inherit">
+            <tr>
+                <th style="text-align: left; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="1">Codigo</th>
+                <th style="text-align: left; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="*">Material</th>
+                <th style="text-align: center; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="1">Previa</th>
+                <th style="text-align: center; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="1">Cantidad</th>
+                <th style="text-align: center; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="1">Total</th>
+            </tr>
+        {% for movimeintoMaterial in data.movimientosMateriales %}
+            <tr>
+                <td style="text-align: center; border-bottom: 1px solid #dcdcdc;  padding: 8px 10px">{{ movimeintoMaterial.getMaterial().codigo }}</td>
+                <td style="border-bottom: 1px solid #dcdcdc;  padding: 8px 10px">{{ movimeintoMaterial.getMaterial().nombre }}</td>
+                <td style="text-align: center; border-bottom: 1px solid #dcdcdc;  padding: 8px 10px">{{ movimeintoMaterial.cantidadPrevia }}</td>
+                <td style="text-align: center; border-bottom: 1px solid #dcdcdc;  padding: 8px 10px">{{ (data.tipoMovimiento == 1) ? '+' : '-' }}{{ movimeintoMaterial.cantidad }}</td>
+                <td style="text-align: center; border-bottom: 1px solid #dcdcdc;  padding: 8px 10px">
+                {% if data.tipoMovimiento == 1 %}
+                    {{ movimeintoMaterial.cantidadPrevia + movimeintoMaterial.cantidad }}
+                {% else %}
+                    {{ movimeintoMaterial.cantidadPrevia - movimeintoMaterial.cantidad }}
+                {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+{% endblock %}

@@ -60,7 +60,9 @@ class MovimientosController extends BaseController
             $response = $this->apiResponse("Movimiento de Inventario (id:{$id}) no encontrado", 404);
         else
             $response = $this->apiResponse($movimiento);
-        
+
+        return $this->render("InventarioBundle:Movimientos:reporteIngreso.html.twig", ["data" => $movimiento]);
+
         return $response;
     }
 
@@ -276,7 +278,7 @@ class MovimientosController extends BaseController
             case 4 : // Egreso a un productor
                      
                 break;
-            case 5 : // Egreso a una bodega
+            case 5 : // Transferencia a una bodega
                 $bodega = $this->getDoctrine()
                     ->getRepository("AdministracionBundle:Bodega")
                     ->findOneBy(["id" => $payload->bodega->id]);
@@ -320,7 +322,7 @@ class MovimientosController extends BaseController
         $this->sendMail(
             "Notificacion de Movimiento de Inventario",
             [$this->getParameter("contador")],
-            "@Inventario/Movimientos/ingresarAction.html.twig", $movimiento
+            "@Inventario/Movimientos/reporteIngreso.html.twig", $movimiento
         );
         
     }
