@@ -1,0 +1,44 @@
+{% extends ':default:baseMail.html.twig' %}
+
+{% block title %}
+    Notificaci&oacute;n de Inventario
+{% endblock %}
+
+{% block body %}
+    <h2>N&uacute;mero de Confirmacion: <span style="color: #787878">{{ data.detalle.confirmacion }}</span></h2>
+    <div style="box-sizing: border-box ;width: 100%; clear: both">
+        <div style="width: 50%; float: left">
+            <dl>
+                <dt style="font-weight: bold; margin-bottom: .3em">Desde</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.bodega.nombre }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Hacia</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.detalle.bodega.nombre }}</dd>
+            </dl>
+        </div>
+        <div style="width: 50%; float: left">
+            <dl>
+                <dt style="font-weight: bold; margin-bottom: .3em">Fecha</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.fecha | date("g:ia d/m/Y") }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Observaciones y Notas</dt>
+                <dd style="margin: 0 .6em .6em"><pre>{{ data.notas }}</pre></dd>
+            </dl>
+        </div>
+    </div>
+    <div style="clear: both">
+        <h3 style="margin: .8em 0 .4em; font-size: 18px">Lista Materiales</h3>
+        <table style="border-collapse: collapse; width: 100%; font-size: inherit">
+            <tr>
+                <th style="text-align: left; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="1">Codigo</th>
+                <th style="text-align: left; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="*">Material</th>
+                <th style="text-align: center; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="1">Cantidad</th>
+            </tr>
+            {% for movimeintoMaterial in data.movimientosMateriales %}
+            <tr>
+                <td style="text-align: center; border-bottom: 1px solid #dcdcdc;  padding: 8px 10px">{{ movimeintoMaterial.getMaterial().codigo }}</td>
+                <td style="border-bottom: 1px solid #dcdcdc;  padding: 8px 10px">{{ movimeintoMaterial.getMaterial().nombre }}</td>
+                <td style="text-align: center; border-bottom: 1px solid #dcdcdc;  padding: 8px 10px">{{ movimeintoMaterial.cantidad }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

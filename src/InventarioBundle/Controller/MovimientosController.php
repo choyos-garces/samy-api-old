@@ -61,11 +61,38 @@ class MovimientosController extends BaseController
         else
             $response = $this->apiResponse($movimiento);
 
-        return $this->render("InventarioBundle:Movimientos:reporteIngreso.html.twig", ["data" => $movimiento]);
-
         return $response;
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     * @Route("/reporte/{id}", name="reporte")
+     * @Method("GET")
+     */
+    public function reporteAction($id) {
+        $movimiento = $this->getDoctrine()
+            ->getRepository("InventarioBundle:MovimientoInventario")
+            ->findOneBy(array("id" => $id));
+
+        return $this->render("reporteTransferencia.html.twig", ["data" => $movimiento]);
+
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     * @Route("/reporte2/{id}", name="reporte2")
+     * @Method("GET")
+     */
+    public function reporte2Action($id) {
+        $movimiento = $this->getDoctrine()
+            ->getRepository("InventarioBundle:MovimientoInventario")
+            ->findOneBy(array("id" => $id));
+
+        return $this->render("InventarioBundle:Movimientos:reporteIngreso.html.twig", ["data" => $movimiento]);
+
+    }
     /**
      * @param Request $request
      * @return JsonResponse
@@ -324,6 +351,7 @@ class MovimientosController extends BaseController
             [$this->getParameter("contador")],
             "@Inventario/Movimientos/reporteIngreso.html.twig", $movimiento
         );
+
         
     }
 }

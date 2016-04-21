@@ -1,36 +1,32 @@
 {% extends ':default:baseMail.html.twig' %}
 
 {% block title %}
-    Notificacion de {{ (data.getTipoMovimiento() == 1) ? 'Ingreso' : 'Egreso' }} de Inventario #{{ data.id }}
+    Notificaci&oacute;n de {{ (data.getTipoMovimiento() == 1) ? 'Ingreso' : 'Egreso' }} de Inventario #{{ data.id }}
 {% endblock %}
 
 {% block body %}
-    <h3 style="margin: .8em 0 .4em; font-size: 18px">Datos del Movimiento</h3>
+    <h3 style="margin: .8em 0 .4em; font-size: 18px">{{ (data.tipoMovimiento == 1) ? 'Ingreso' : 'Egreso' }}de Material</h3>
     <div style="box-sizing: border-box ;width: 100%; clear: both">
         <div style="width: 50%; float: left">
             <dl>
-                <dt style="font-weight: bold; margin-bottom: .3em">Tipo</dt>
-                <dd style="margin: 0 .6em .6em">{{ (data.tipoMovimiento == 1) ? 'Ingreso' : 'Egreso' }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Fecha de Reporte</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.fecha | date("g:ia d/m/Y") }}</dd>
                 <dt style="font-weight: bold; margin-bottom: .3em">Bodega</dt>
                 <dd style="margin: 0 .6em .6em">{{ data.bodega.nombre }}</dd>
-                <dt style="font-weight: bold; margin-bottom: .3em">Motivo</dt>
+                <dt style="font-weight: bold; margin-bottom: .3em">Motivo del movimiento</dt>
                 <dd style="margin: 0 .6em .6em">{{ data.motivoMovimiento.nombre }}</dd>
-                <dt style="font-weight: bold; margin-bottom: .3em">Fecha</dt>
-                <dd style="margin: 0 .6em .6em">{{ data.fecha | date("g:ia d/m/Y") }}</dd>
             </dl>
         </div>
         <div style="width: 50%; float: left">
             <dl>
             {% if data.motivoMovimiento.id == 1 %}
-                <dt style="font-weight: bold; margin-bottom: .3em">Tipo</dt>
-                <dd style="margin: 0 .6em .6em">{{ (data.tipoMovimiento == 1) ? 'Ingreso' : 'Egreso' }}</dd>
-                <dt style="font-weight: bold; margin-bottom: .3em">Bodega</dt>
-                <dd style="margin: 0 .6em .6em">{{ data.bodega.nombre }}</dd>
-                <dt style="font-weight: bold; margin-bottom: .3em">Motivo</dt>
-                <dd style="margin: 0 .6em .6em">{{ data.motivoMovimiento.nombre }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Proveedor</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.detalle.proveedor.razonSocial }}</dd>
+                <dt style="font-weight: bold; margin-bottom: .3em">Factura</dt>
+                <dd style="margin: 0 .6em .6em">{{ data.detalle.factura }}</dd>
             {% endif %}
             {% if (data.motivoMovimiento.id == 5 or data.motivoMovimiento.id == 2) %}
-                <dt style="font-weight: bold; margin-bottom: .3em">Bodegao</dt>
+                <dt style="font-weight: bold; margin-bottom: .3em">Bodega Destino</dt>
                 <dd style="margin: 0 .6em .6em">{{ data.detalle.bodega.nombre }}</dd>
                 <dt style="font-weight: bold; margin-bottom: .3em">Numero de Confirmaci&oacute;n</dt>
                 <dd style="margin: 0 .6em .6em">{{ data.detalle.confirmacion }}</dd>
