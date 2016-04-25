@@ -18,7 +18,8 @@ class AppKernel extends Kernel
             new JMS\SerializerBundle\JMSSerializerBundle(),
             new InventarioBundle\InventarioBundle(),
             new AdministracionBundle\AdministracionBundle(),
-            new ControlPanelBundle\ControlPanelBundle()
+            new ControlPanelBundle\ControlPanelBundle(),
+            new RecursosHumanosBundle\RecursosHumanosBundle()
 
         ];
 

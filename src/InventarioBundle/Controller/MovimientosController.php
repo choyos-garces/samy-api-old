@@ -75,24 +75,10 @@ class MovimientosController extends BaseController
             ->getRepository("InventarioBundle:MovimientoInventario")
             ->findOneBy(array("id" => $id));
 
-        return $this->render("reporteTransferencia.html.twig", ["data" => $movimiento]);
+        return $this->render("@Inventario/Movimientos/reporteEmpresas.html.twig", ["data" => $movimiento]);
 
     }
 
-    /**
-     * @param $id
-     * @return JsonResponse
-     * @Route("/reporte2/{id}", name="reporte2")
-     * @Method("GET")
-     */
-    public function reporte2Action($id) {
-        $movimiento = $this->getDoctrine()
-            ->getRepository("InventarioBundle:MovimientoInventario")
-            ->findOneBy(array("id" => $id));
-
-        return $this->render("InventarioBundle:Movimientos:reporteIngreso.html.twig", ["data" => $movimiento]);
-
-    }
     /**
      * @param Request $request
      * @return JsonResponse
@@ -299,10 +285,10 @@ class MovimientosController extends BaseController
                 }
                 
                 break;
-            case 3 :
+            case 3 : // Ingreso por Productor
                 
                 break;
-            case 4 : // Egreso a un productor
+            case 4 : // Egreso a un Productor
                      
                 break;
             case 5 : // Transferencia a una bodega
@@ -325,12 +311,13 @@ class MovimientosController extends BaseController
                     ->getRepository("AdministracionBundle:Empresa")
                     ->findOneBy(["id" => $payload->proveedor->id]);
 
-                if($proveedor == null)
+                if($proveedor == null || $payload->factura != null )
                 {
                     $errores[] = "Proveedor selecionado es inválido.";
                 }
                 else {
                     $detalle->setProveedor($proveedor);
+                    $detalle->setFactura($payload->factura);
                 }
                 
                 break;

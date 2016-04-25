@@ -5,29 +5,31 @@
 {% endblock %}
 
 {% block body %}
-    {% if (data.motivoMovimiento.id == 2 or data.motivoMovimiento.id == 5) %}
-        <h2>N&uacute;mero de Confirmacion: <span style="color: #787878">{{ data.detalle.confirmacion }}</span></h2>
-    {% endif %}
-    <div style="box-sizing: border-box ;width: 100%; clear: both">
-        <div style="width: 50%; float: left">
-            <dl>
-                <dt style="font-weight: bold; margin-bottom: .3em">Desde</dt>
-                <dd style="margin: 0 .6em .6em">{{ data.bodega.nombre }}</dd>
-                <dt style="font-weight: bold; margin-bottom: .3em">Hacia</dt>
-                <dd style="margin: 0 .6em .6em">{{ data.detalle.bodega.nombre }}</dd>
-            </dl>
-        </div>
-        <div style="width: 50%; float: left">
-            <dl>
-                <dt style="font-weight: bold; margin-bottom: .3em">Fecha</dt>
-                <dd style="margin: 0 .6em .6em">{{ data.fecha | date("g:ia d/m/Y") }}</dd>
-                <dt style="font-weight: bold; margin-bottom: .3em">Observaciones y Notas</dt>
-                <dd style="margin: 0 .6em .6em"><pre>{{ data.notas }}</pre></dd>
-            </dl>
-        </div>
-    </div>
+    <table style="font-size: 14px">
+        <tr>
+            <th style="text-align: right; padding-right: .6em" valign="top">Fecha</th>
+            <td>{{ data.fecha | date("g:ia d/m/Y") }}</td>
+        </tr>
+        <tr>
+            <th style="text-align: right; padding-right: .6em" valign="top">Motivo</th>
+            <td>{{ data.motivoMovimiento.nombre }}</td>
+        </tr>
+    </table>
+    <dl>
+        <dt style="font-weight: bold; margin-bottom: .3em">Proveedor</dt>
+        <dd style="margin: 0 .6em .6em">
+            <span style="color: #787878">Nombre: </span> {{ data.detalle.proveedor.razonSocial }}<br />
+            <span style="color: #787878">{{ data.detalle.proveedor.tipoIdentificacion.nombre }}: </span> {{ data.detalle.proveedor.identificacion }}<br />
+            <span style="color: #787878">Factura: </span> {{ data.detalle.factura }}<br/>
+            <span style="color: #787878">Total de Materiales: </span> {{ data.movimientosMateriales | length }}<br/>
+        </dd>
+    </dl>
+    <dl>
+        <dt style="font-weight: bold; margin-bottom: .3em">Observaciones</dt>
+        <dd style="margin: 0 .6em .6em"><pre style="color: #3c3c3c; background-color: #ebebeb; margin: 0; padding: .3em .6em">{{ data.notas }}</pre></dd>
+    </dl>
     <div style="clear: both">
-        <h3 style="margin: .8em 0 .4em; font-size: 18px">Lista Materiales</h3>
+        <h3 style="margin: .8em 0 .4em; font-size: 18px">Lista de Materiales</h3>
         <table style="border-collapse: collapse; width: 100%; font-size: inherit">
             <tr>
                 <th style="text-align: left; border-bottom: 2px solid #dcdcdc; padding: 8px 10px" width="1">Codigo</th>
