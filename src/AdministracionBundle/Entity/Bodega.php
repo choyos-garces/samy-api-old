@@ -2,7 +2,6 @@
 namespace AdministracionBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use InventarioBundle\Entity\InventarioMaterial;
 
 /**
  * Material
