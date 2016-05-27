@@ -2,6 +2,8 @@
 
 namespace InventarioBundle\Repository;
 
+use AdministracionBundle\Entity\Material;
+
 /**
  * MovimientoMaterialRepository
  *
@@ -10,4 +12,19 @@ namespace InventarioBundle\Repository;
  */
 class MovimientoMaterialRepository extends \Doctrine\ORM\EntityRepository
 {
+
+    /**
+     * @param Material $material
+     * @param \DateTime $date
+     * @return array
+     */
+    public function findByMaterialAfterDate(Material $material, \DateTime $date) {
+        return $this->createQueryBuilder('m')
+            ->where("m.material = :material")
+            ->andWhere("m.fecha > :date")
+            ->setParameter('material', $material)
+            ->setParameter('date', $date)
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

@@ -32,7 +32,7 @@ class BaseController extends Controller {
     protected function serializer($data, $type)
     {
         if($type == JSON_SIMPLE) return json_encode($data);
-        return $this->get("jms_serializer")->serialize($data, 'json');
+        else return $this->get("jms_serializer")->serialize($data, 'json');
     }
 
 

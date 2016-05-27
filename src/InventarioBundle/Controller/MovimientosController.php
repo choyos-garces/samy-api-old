@@ -203,7 +203,29 @@ class MovimientosController extends BaseController
 
         return $response;
     }
-    
+
+    /**
+     * @Route("/anular/{id}", name="movimiento_anular")
+     * @param $id string
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function anularAction($id) {
+        $movimiento = $this->getDoctrine()
+            ->getRepository("InventarioBundle:MovimientoInventario")
+            ->findOneBy(["id" => $id]);
+
+        $lista = $movimiento->getMovimientosMateriales();
+        foreach ($lista as $item) {
+            $movimeintosMaterial = $this->getDoctrine()
+                ->getRepository("InventarioBundle:MovimientoMaterial")
+                ->findByMaterialAfterDate($item->getMaterial(), $item->getFecha());
+            echo json_encode($item->getMaterial()->getNombre())."\n";
+            echo json_encode($movimeintosMaterial)."\n";
+        }
+        $response = $this->apiResponse(null);
+        return $response;
+    }
+
     /**
      * @param Bodega $bodega
      * @param Material $material
@@ -340,5 +362,25 @@ class MovimientosController extends BaseController
         );
 
         
+    }
+
+    private function handleAnularMovimiento(MovimientoInventario $movimiento) {
+        /**
+         * TODO
+         * - Sacar la lista de materiales en el movimiento
+         * - Ver si es el ultimo movimiento realizado en ese material
+         * - De no ser actualizar todos lo movimientos q le vienen
+         */
+
+        //Lista de movimiento de materiales
+        /**
+         * @var MovimientoMaterial[]
+         */
+        $lista = $movimiento->getMovimientosMateriales();
+
+        foreach ($lista as $item) {
+            $item->getMaterial();
+        }
+
     }
 }
